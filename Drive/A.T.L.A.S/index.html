@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <base target="_top">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ATLAS • Automated Template for Linked Accessed SharedDrives</title>
+    <style>
+      :root{
+        --bg-start:#1f1035; --bg-end:#0a1b3e;
+        --primary:#8b5cf6; --primary-2:#3b82f6;
+        --text:#e5e7eb; --muted:#94a3b8;
+        --panel:#0b1020ee; --panel-border:#2a2f48;
+        --input:#0e1426; --input-border:#2a365e;
+        --success-bg:#052e2b; --success-border:#10b981;
+        --error-bg:#3b0b0b; --error-border:#ef4444;
+        --shadow: 0 20px 50px rgba(0,0,0,0.45);
+      }
+      :root.light{
+        --bg-start:#f7f8ff; --bg-end:#f0f4ff;
+        --text:#0f172a; --muted:#475569;
+        --panel:#ffffffee; --panel-border:#e5e7eb;
+        --input:#ffffff; --input-border:#cbd5e1;
+        --success-bg:#ecfdf5; --success-border:#10b981;
+        --error-bg:#fef2f2; --error-border:#ef4444;
+        --shadow: 0 6px 24px rgba(2,6,23,0.08);
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
+        color:var(--text);
+        background: radial-gradient(1200px 800px at 20% 10%, rgba(139,92,246,.15), transparent),
+                    radial-gradient(1200px 800px at 80% 90%, rgba(59,130,246,.12), transparent),
+                    linear-gradient(135deg, var(--bg-start), var(--bg-end));
+        min-height:100%;
+      }
+      .wrap{ max-width:980px; margin:0 auto; padding:48px 20px 72px; }
+
+      .header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; }
+      .brand{ display:flex; align-items:center; gap:16px; }
+      .logo{
+        width:54px; height:54px; border-radius:16px;
+        background: conic-gradient(from 180deg at 50% 50%, var(--primary), var(--primary-2), var(--primary));
+        box-shadow: 0 10px 30px rgba(99,102,241,.35);
+      }
+      .title h1{
+        margin:0; font-size:28px; letter-spacing:.4px; font-weight:800;
+        background: linear-gradient(90deg, var(--primary), var(--primary-2));
+        -webkit-background-clip:text; background-clip:text; color:transparent;
+      }
+      .title p{ margin:4px 0 0; color:var(--muted); font-size:14px; }
+
+      .theme-toggle{ display:inline-flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); }
+      .toggle-btn{ width:44px; height:26px; border-radius:999px; background:#11182733; border:1px solid var(--panel-border); position:relative; cursor:pointer; }
+      .toggle-dot{ position:absolute; top:2px; left:2px; width:22px; height:22px; border-radius:50%; background: linear-gradient(90deg, var(--primary), var(--primary-2)); transition:left .2s ease; }
+      :root.light .toggle-dot{ left:20px; }
+
+      .panel{ background: var(--panel); border:1px solid var(--panel-border); border-radius:18px; padding:24px; box-shadow: var(--shadow); backdrop-filter: blur(6px); }
+      .grid{ display:grid; gap:16px; }
+      @media (min-width: 860px){ .grid.cols-2{ grid-template-columns: 1fr 1fr; } }
+      .row{ display:flex; flex-direction:column; gap:8px; }
+      label{ font-size:13px; color:#cbd5e1; font-weight:600; }
+      :root.light label{ color:#0f172a; }
+      .hint{ color:var(--muted); font-size:12px; }
+
+      input[type="text"], textarea, select{
+        background:var(--input); color:var(--text);
+        border:1px solid var(--input-border); border-radius:10px; padding:10px 12px; font-size:14px;
+        transition: border-color .15s ease, box-shadow .15s ease; outline:none;
+      }
+      textarea{ resize:vertical; min-height:70px; }
+      input[type="text"]:focus, textarea:focus, select:focus{ border-color:var(--primary); box-shadow:0 0 0 3px rgba(139,92,246,.18); }
+
+      .prefix-pill{
+        display:inline-flex; align-items:center; gap:8px;
+        background:rgba(139,92,246,.08); border:1px solid rgba(139,92,246,.25);
+        color:#d6ccff; padding:6px 10px; border-radius:999px; font-size:12px;
+      }
+      :root.light .prefix-pill{ background:#f5f3ff; color:#5b21b6; border-color:#ddd6fe; }
+
+      .section-title{
+        font-weight:800; font-size:13px; text-transform:uppercase; letter-spacing:.12em;
+        color:#c7d2fe; margin:16px 0 8px;
+      }
+      :root.light .section-title{ color:#4338ca; }
+      .divider{ height:1px; background:linear-gradient(90deg, transparent, #334155, transparent); margin:8px 0 16px; }
+      :root.light .divider{ background:linear-gradient(90deg, transparent, #e5e7eb, transparent); }
+
+      .actions{ display:flex; gap:12px; justify-content:flex-end; margin-top:8px; }
+      .btn{
+        appearance:none; border:none; cursor:pointer;
+        background:linear-gradient(90deg, var(--primary), var(--primary-2)); color:white;
+        font-weight:700; letter-spacing:.3px; padding:12px 16px; border-radius:12px; font-size:14px;
+        box-shadow: 0 10px 30px rgba(59,130,246,.25); transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
+        display:inline-flex; align-items:center; gap:10px;
+      }
+      .btn:hover{ filter:brightness(1.05); box-shadow:0 14px 36px rgba(59,130,246,.35); }
+      .btn:active{ transform: translateY(1px); }
+      .btn:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none; }
+
+      .spinner{ width:16px; height:16px; border-radius:50%; border:2px solid rgba(255,255,255,.35); border-top-color:#fff; animation: spin .7s linear infinite; }
+      @keyframes spin{ to { transform: rotate(360deg); } }
+
+      .msg{ margin-top:16px; }
+      .success, .error{ padding:12px 14px; border-radius:12px; border:1px solid; font-size:14px; }
+      .success{ background:var(--success-bg); border-color:var(--success-border); color:#b6f7e4; }
+      .error{ background:var(--error-bg); border-color:var(--error-border); color:#fecaca; }
+      .list{ margin-top:10px; padding-left:18px; }
+      .list li{ margin:6px 0; }
+
+      .footer{ margin-top:22px; color:var(--muted); font-size:12px; text-align:center; }
+      .kbd{
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        background:#0b1430; border:1px solid #263156; padding:2px 6px; border-radius:6px; font-size:12px;
+      }
+      :root.light .kbd{ background:#f1f5f9; border-color:#e2e8f0; }
+    </style>
+
+    <script>
+      // Theme toggle (default dark). Persists in sessionStorage.
+      function applyTheme(t){ document.documentElement.classList.toggle('light', t==='light'); }
+      function toggleTheme(){
+        const cur = document.documentElement.classList.contains('light') ? 'light' : 'dark';
+        const next = cur === 'light' ? 'dark' : 'light';
+        sessionStorage.setItem('atlas-theme', next);
+        applyTheme(next);
+      }
+      (function initTheme(){
+        const saved = sessionStorage.getItem('atlas-theme') || 'dark';
+        applyTheme(saved);
+      })();
+
+      // Template selector state
+      const TEMPLATES = {
+        PMO:     { label: "PMO",     prefix: "PMO--"     },
+        FINANCE: { label: "Finance", prefix: "Finance--" },
+        ACQ:     { label: "Acq",     prefix: "Acq--"     }
+      };
+
+      function onTemplateChange() {
+        const sel = document.getElementById("templateKey");
+        const key = sel.value;
+        const prefix = TEMPLATES[key].prefix;
+        // Update prefix pill + hint
+        document.getElementById("prefixPill").textContent = `${prefix} (fixed)`;
+        document.getElementById("finalNameHint").innerHTML = `Final name → <span class="kbd">${prefix}&lt;your text&gt;</span>`;
+      }
+
+      function parseEmails(value){ return value.split(",").map(e=>e.trim()).filter(Boolean); }
+
+      function onSubmitForm(ev){
+        ev.preventDefault();
+
+        const templateKey = document.getElementById("templateKey").value;     // PMO | FINANCE | ACQ
+        const prefix      = TEMPLATES[templateKey].prefix;                    // PMO-- / Finance-- / Acq--
+        const driveNameInput = document.getElementById("driveName").value.trim();
+        const owners = [ document.getElementById("owner1").value.trim(), document.getElementById("owner2").value.trim() ].filter(Boolean);
+        const editors = parseEmails(document.getElementById("editors").value);
+        const viewers = parseEmails(document.getElementById("viewers").value);
+        const commenters = parseEmails(document.getElementById("commenters").value);
+
+        const btn = document.getElementById("submitBtn");
+        const out = document.getElementById("output");
+
+        out.innerHTML = "";
+        if (owners.length < 1){
+          out.innerHTML = `<div class="error">Please provide at least <strong>one owner</strong> email.</div>`;
+          return;
+        }
+        if (!driveNameInput){
+          out.innerHTML = `<div class="error">Please provide a <strong>Drive Name (suffix)</strong>.</div>`;
+          return;
+        }
+
+        btn.disabled = true;
+        const original = btn.innerHTML;
+        btn.innerHTML = `<span class="spinner" aria-hidden="true"></span> Creating…`;
+
+        google.script.run
+          .withSuccessHandler(res => {
+            btn.disabled = false;
+            btn.innerHTML = original;
+
+            const folderList = (res.folders || [])
+              .map(f => `<li><a href="${f.url}" target="_blank">${f.name}</a></li>`)
+              .join("");
+
+            out.innerHTML = `
+              <div class="success">
+                <strong>Success!</strong><br/>
+                Shared Drive <em>${prefix}${driveNameInput}</em> created.<br/>
+                <a href="${res.driveUrl}" target="_blank">${res.driveUrl}</a>
+                ${folderList ? `<div style="margin-top:8px;">Folders created:</div><ul class="list">${folderList}</ul>` : ""}
+              </div>`;
+          })
+          .withFailureHandler(err => {
+            btn.disabled = false;
+            btn.innerHTML = original;
+            out.innerHTML = `<div class="error"><strong>Error:</strong> ${err.message || err}</div>`;
+          })
+          .createSharedDriveAndFolders({ prefix, templateKey, driveNameInput, owners, editors, viewers, commenters });
+      }
+    </script>
+  </head>
+
+  <body>
+    <div class="wrap">
+      <div class="header">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div class="title">
+            <h1>ATLAS</h1>
+            <p>Automated Template for Linked Accessed SharedDrives</p>
+          </div>
+        </div>
+
+        <div class="theme-toggle">
+          Theme
+          <div class="toggle-btn" onclick="toggleTheme()" title="Toggle theme">
+            <div class="toggle-dot"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <form onsubmit="onSubmitForm(event)">
+          <div class="section-title">Choose Template</div>
+          <div class="divider"></div>
+
+          <div class="grid cols-2">
+            <div class="row">
+              <label for="templateKey">Template</label>
+              <select id="templateKey" onchange="onTemplateChange()">
+                <option value="PMO">PMO</option>
+                <option value="FINANCE">Finance</option>
+                <option value="ACQ">Acq</option>
+              </select>
+              <div class="hint">Select the structure to generate.</div>
+            </div>
+
+            <div class="row">
+              <label>Prefix</label>
+              <div id="prefixPill" class="prefix-pill">PMO-- (fixed)</div>
+            </div>
+          </div>
+
+          <div class="grid cols-2" style="margin-top:6px;">
+            <div class="row">
+              <label for="driveName">Drive Name (suffix)</label>
+              <input type="text" id="driveName" placeholder="e.g., Project-Apollo" required />
+              <div id="finalNameHint" class="hint">Final name → <span class="kbd">PMO--&lt;your text&gt;</span></div>
+            </div>
+          </div>
+
+          <div class="section-title">Access & Roles</div>
+          <div class="divider"></div>
+
+          <div class="grid cols-2">
+            <div class="row">
+              <label>Owners (min 1, max 2)</label>
+              <input type="text" id="owner1" placeholder="owner1@example.com" />
+              <input type="text" id="owner2" placeholder="owner2@example.com" />
+              <div class="hint">Owners are Shared Drive “Managers”.</div>
+            </div>
+
+            <div class="row">
+              <label for="editors">Editors (comma-separated) — optional</label>
+              <textarea id="editors" rows="3" placeholder="editor1@example.com, editor2@example.com"></textarea>
+            </div>
+          </div>
+
+          <div class="grid cols-2">
+            <div class="row">
+              <label for="viewers">Viewers (comma-separated) — optional</label>
+              <textarea id="viewers" rows="3" placeholder="viewer-group@example.com"></textarea>
+            </div>
+
+            <div class="row">
+              <label for="commenters">Commenters (comma-separated) — optional</label>
+              <textarea id="commenters" rows="3" placeholder="commenter@example.com"></textarea>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="submitBtn" type="submit" class="btn">
+              Create Shared Drive
+            </button>
+          </div>
+        </form>
+
+        <div id="output" class="msg"></div>
+      </div>
+
+      <div class="footer">
+        ATLAS • Automated Template for Linked Accessed SharedDrives · Dark/Light theme · Folder links on success
+      </div>
+    </div>
+
+    <script>
+      // initialize prefix pill/hint on first load
+      onTemplateChange();
+    </script>
+  </body>
+</html>
