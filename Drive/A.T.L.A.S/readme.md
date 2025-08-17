@@ -30,7 +30,7 @@ PMO: Common project lifecycle folders (Charter, Requirements, Testing, Deliverab
 
 Finance: Departmental folders (Budgeting, Payroll, Audit, etc.).
 
-Acquisitions: General placeholder folders (customizable).
+Acquisitions: General placeholder folders (Folder1, Folder2, Folder3, etc.).
 
 Email Notifications
 
@@ -100,8 +100,6 @@ Roadmap
 ✅ Modern UI (dark mode)
 
 🔲 Light/dark theme toggle
-
-🔲 Custom template builder (create your own)
 
 🔲 Admin dashboard for usage tracking
 
