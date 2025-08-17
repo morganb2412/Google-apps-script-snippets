@@ -79,16 +79,9 @@ Open Google Apps Script.
 Create a new project and add these files:
 
 Code.gs
-
-app_home.html
-
 index.html (PMO)
 
-finance.html
 
-acq.html
-
-style.css
 
 Enable the Google Drive API v3 in:
 
