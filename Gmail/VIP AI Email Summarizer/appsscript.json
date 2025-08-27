@@ -1,0 +1,26 @@
+{
+  "timeZone": "America/Chicago",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/gmail.addons.execute",
+    "https://www.googleapis.com/auth/gmail.readonly",
+    "https://www.googleapis.com/auth/gmail.modify",
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/script.storage",
+    "https://www.googleapis.com/auth/script.send_mail",
+    "https://www.googleapis.com/auth/script.scriptapp",
+    "https://www.googleapis.com/auth/userinfo.email"
+  ],
+  "addOns": {
+    "common": {
+      "name": "VIP Email Summarizer",
+      "logoUrl": "Enter your logo here!",
+      "layoutProperties": { "primaryColor": "#0B57D0", "secondaryColor": "#0B57D0" }
+    },
+    "gmail": {
+      "homepageTrigger": { "runFunction": "onGmailAddonOpen" },
+      "contextualTriggers": [{ "unconditional": {}, "onTriggerFunction": "onGmailMessageOpen" }],
+      "openLinkUrlPrefixes": ["https://mail.google.com/"]
+    }
+  }
+}
