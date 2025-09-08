@@ -1,6 +1,6 @@
 # Atlas Mass Drive Creation (Google Apps Script Web App)
 
-This project, *Atlas Mass Drive Creation*, is a Google Apps Script web application that automates the creation of Google Shared Drives and applies group permissions based on a configuration stored in a Google Sheet.  
+This project, Atlas Mass Drive Creation, is a Google Apps Script web application that automates the creation of Google Shared Drives and applies group permissions based on a configuration stored in a Google Sheet.  
 
 Instead of manually creating drives and assigning groups, you simply prepare a Sheet, paste its link into the app, and the script does the rest.  
 At the end of each run, you will receive an **email report** summarizing:
