@@ -97,4 +97,5 @@ You will receive an **email report** with links to the created drives and any er
 
 ## License
 This project is open for internal or personal use. Customize as needed for your organization.
+<img width="812" height="568" alt="image" src="https://github.com/user-attachments/assets/bee99e6d-f4b9-468e-808e-f6ab380b8720" />
 
