@@ -1,12 +1,19 @@
 {
   "manifest_version": 3,
   "name": "Legacy DevBridge",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Governed source control and AI engineering for Google Apps Script.",
-  "permissions": ["sidePanel"],
-  "host_permissions": ["https://script.google.com/*"],
+  "permissions": ["sidePanel", "tabs"],
+  "host_permissions": ["https://script.google.com/*", "http://127.0.0.1:8000/*"],
   "background": { "service_worker": "background.js", "type": "module" },
   "side_panel": { "default_path": "index.html" },
   "action": { "default_title": "Open Legacy DevBridge" },
+  "content_scripts": [
+    {
+      "matches": ["https://script.google.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
   "content_security_policy": { "extension_pages": "script-src 'self'; object-src 'self'" }
 }
