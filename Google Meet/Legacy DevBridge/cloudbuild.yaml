@@ -17,7 +17,7 @@ steps:
       - --region=${_REGION}
       - --platform=managed
       - --no-allow-unauthenticated
-      - --set-env-vars=DEVBRIDGE_ENV=production
+      - --set-env-vars=DEVBRIDGE_ENVIRONMENT=production
 images:
   - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/legacy-devbridge/api:${_TAG}
 options:
