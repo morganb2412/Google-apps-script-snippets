@@ -13,8 +13,9 @@ export type ProjectContextState =
 
 export type ExtensionMessage =
   | { type: "DEVBRIDGE_PROJECT_CONTEXT"; payload: ProjectContext }
+  | { type: "DEVBRIDGE_PROJECT_CONTEXT_CLEARED" }
   | { type: "DEVBRIDGE_GET_PROJECT_CONTEXT" }
-  | { type: "DEVBRIDGE_PROJECT_CONTEXT_CHANGED"; payload: ProjectContext }
+  | { type: "DEVBRIDGE_PROJECT_CONTEXT_CHANGED"; payload: ProjectContext | null }
   | { type: "DEVBRIDGE_OPEN_PANEL"; section: DevBridgeSection }
   | { type: "DEVBRIDGE_NAVIGATE"; section: DevBridgeSection };
 

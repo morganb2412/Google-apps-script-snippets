@@ -16,8 +16,8 @@ export function extractScriptId(url: URL): string | null {
 
 export function normalizeProjectName(title: string): string | null {
   const name = title
-    .replace(/\s*[–—-]\s*Google Apps Script\s*$/i, "")
-    .replace(/^Google Apps Script\s*[–—-]\s*/i, "")
+    .replace(/\s*[-\u2013\u2014]\s*Google Apps Script\s*$/i, "")
+    .replace(/^Google Apps Script\s*[-\u2013\u2014]\s*/i, "")
     .trim();
   return name && name.toLowerCase() !== "google apps script" ? name : null;
 }

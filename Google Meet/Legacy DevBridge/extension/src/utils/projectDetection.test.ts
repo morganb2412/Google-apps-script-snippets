@@ -25,4 +25,14 @@ describe("Apps Script project detection", () => {
       editorUrl: "https://script.google.com/home/projects/1AbC_def-123/edit",
     });
   });
+
+  test("supports current and legacy Apps Script editor URL shapes", () => {
+    expect(extractScriptId(new URL("https://script.google.com/d/legacy-project/edit"))).toBe("legacy-project");
+    expect(extractScriptId(new URL("https://script.google.com/home/projects/current-project/edit"))).toBe("current-project");
+  });
+
+  test("normalizes en dash, em dash, and prefixed editor titles", () => {
+    expect(normalizeProjectName("Project Atlas — Google Apps Script")).toBe("Project Atlas");
+    expect(normalizeProjectName("Google Apps Script - Project Atlas")).toBe("Project Atlas");
+  });
 });

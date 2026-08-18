@@ -1,6 +1,7 @@
 import type { ExtensionMessage, ProjectContext } from "../types/project";
 import { detectProjectContext } from "../utils/projectDetection";
 import { mountDevBridgeToolbar } from "./toolbar";
+import { watchProjectNavigation } from "./projectNavigation";
 
 let lastProjectKey = "";
 
@@ -19,11 +20,12 @@ function currentContext(): ProjectContext | null {
 
 function publishContext(): void {
   const context = currentContext();
-  if (!context) return;
-  const projectKey = `${context.scriptId}:${context.name ?? ""}`;
+  const projectKey = context ? `${context.scriptId}:${context.name ?? ""}` : "NO_PROJECT";
   if (projectKey === lastProjectKey) return;
   lastProjectKey = projectKey;
-  const message: ExtensionMessage = { type: "DEVBRIDGE_PROJECT_CONTEXT", payload: context };
+  const message: ExtensionMessage = context
+    ? { type: "DEVBRIDGE_PROJECT_CONTEXT", payload: context }
+    : { type: "DEVBRIDGE_PROJECT_CONTEXT_CLEARED" };
   safeSend(message);
 }
 
@@ -38,8 +40,4 @@ mountDevBridgeToolbar((section) => {
   const message: ExtensionMessage = { type: "DEVBRIDGE_OPEN_PANEL", section };
   safeSend(message);
 });
-new MutationObserver(publishContext).observe(document.querySelector("title") ?? document.documentElement, {
-  childList: true,
-  subtree: true,
-});
-window.addEventListener("popstate", publishContext);
+watchProjectNavigation(publishContext);

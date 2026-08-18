@@ -21,6 +21,11 @@ chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender, sendRes
     void chrome.runtime.sendMessage({ type: "DEVBRIDGE_PROJECT_CONTEXT_CHANGED", payload: message.payload } satisfies ExtensionMessage).catch(() => undefined);
     return false;
   }
+  if (message.type === "DEVBRIDGE_PROJECT_CONTEXT_CLEARED" && sender.tab?.id !== undefined) {
+    projectByTab.delete(sender.tab.id);
+    void chrome.runtime.sendMessage({ type: "DEVBRIDGE_PROJECT_CONTEXT_CHANGED", payload: null } satisfies ExtensionMessage).catch(() => undefined);
+    return false;
+  }
   if (message.type !== "DEVBRIDGE_GET_PROJECT_CONTEXT") return false;
   void chrome.tabs.query({ active: true, currentWindow: true }).then(async ([tab]) => {
     if (!tab?.id || !tab.url?.startsWith("https://script.google.com/")) {

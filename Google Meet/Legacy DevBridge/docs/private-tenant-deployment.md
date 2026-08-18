@@ -2,6 +2,25 @@
 
 Legacy DevBridge is distributed as a private Chrome extension and is not publicly searchable. The backend remains the private Cloud Run service in GCP project `moesautomationweekly`.
 
+## Pilot installation verification
+
+Before uploading a tenant release, verify the exact build locally in Chrome:
+
+1. Run `npm ci`, `npm run typecheck`, `npm run lint`, `npm test -- --run`, and `npm run build` from `extension/`.
+2. Open `chrome://extensions`, enable **Developer mode**, and choose **Load unpacked**.
+3. Select the generated `extension/dist` directory, not `extension/src` and not the release ZIP.
+4. Open an Apps Script project at `https://script.google.com/home/projects/<SCRIPT_ID>/edit`.
+5. Confirm the DevBridge toolbar appears and **Project**, **Changes**, and **Code Assistant** open the side panel.
+6. Navigate to another Apps Script project without closing the tab and confirm the project ID and name update.
+7. Navigate to the Apps Script home page and confirm DevBridge no longer shows the prior project as active.
+8. Reload the unpacked extension, reload the Apps Script tab, and repeat steps 5-7.
+
+Record the Chrome version, extension version, tester, date, and results before promoting the ZIP.
+
+## Chromium Edge compatibility
+
+The extension uses Manifest V3, standard content scripts, and the Chromium `sidePanel` API. Microsoft Edge compatibility is expected but is not considered verified until the same pilot checklist passes in `edge://extensions`. Tenant rollout remains Chrome-first; Edge should be assigned to a separate pilot group until validated.
+
 ## Release package
 
 From `extension/` run:
