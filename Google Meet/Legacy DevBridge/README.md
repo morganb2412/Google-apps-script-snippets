@@ -6,8 +6,8 @@ Legacy DevBridge is a production-oriented foundation for connecting Google Apps 
 
 ```text
 Apps Script Editor -> MV3 Extension -> FastAPI on Cloud Run
-                                        |-- Apps Script API (planned)
-                                        |-- GitHub App (planned)
+                                        |-- Apps Script API adapter
+                                        |-- GitHub App adapter
                                         `-- Provider-neutral AI runtime (planned)
 ```
 
@@ -58,7 +58,7 @@ Load `extension/dist` via Chrome's **Extensions > Developer mode > Load unpacked
 5. Pin and click **Legacy DevBridge** in Chrome's extension menu.
 6. Confirm the side panel shows the project title and ID. The repository remains **Not connected** until the GitHub integration milestone.
 
-Version 0.5 includes the isolated Apps Script toolbar, guided onboarding, and an explicitly labeled Demo Workspace covering repository, branch, commit, pull request, comparison/diff, AI PLAN/REVIEW, standards, and health workflows. Demo actions perform no external writes. Follow [docs/demo-script.md](docs/demo-script.md).
+The extension includes the isolated Apps Script toolbar, guided onboarding, and an explicitly labeled Demo Workspace covering repository, branch, commit, pull request, comparison/diff, conversational code assistance, standards, and health workflows. Demo actions perform no external writes. Follow [docs/demo-script.md](docs/demo-script.md).
 
 After rebuilding, use the extension card's **Reload** button and reload the Apps Script tab so its content script is refreshed.
 
@@ -74,7 +74,7 @@ Google OAuth and GitHub App credentials will be handled server-side. The browser
 
 ## Current status
 
-Milestones 1–2 include the API health endpoint, typed Apps Script context validation, MV3 side-panel shell, Apps Script editor project detection, tab-scoped extension messaging, shared schema, tests, lint/type/build configuration, Cloud Run packaging, CI, standards, and architecture/security documentation. Real Google OAuth, source retrieval, and GitHub connections remain later milestones.
+Version 0.10 includes the API and extension foundations, Apps Script editor detection, tenant OAuth and GitHub App handshakes behind disabled production gates, typed provider adapters, guarded Apps Script writes, and project mapping/Create-or-Connect orchestration. Provider credentials, durable Firestore mappings, authenticated live routes, and end-to-end connection tests are not yet complete and are never simulated as production success.
 
 ## Roadmap
 

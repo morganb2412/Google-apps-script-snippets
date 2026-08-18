@@ -1,3 +1,4 @@
+from app.appsscript.models import ProjectFile, ProjectSnapshot
 from app.audit.models import AuditEvent
 from app.audit.repository import AuditRepository
 from app.github.auth import GitHubInstallationAuth
@@ -9,6 +10,7 @@ from app.github.models import (
     GitHubFile,
     GitHubRepository,
 )
+from app.github.normalization import create_github_snapshot
 
 
 class GitHubService:
@@ -80,3 +82,39 @@ class GitHubService:
         return await self.gateway.get_file(
             owner, repo, path, ref, await self.auth.token_for(installation_id)
         )
+
+    async def create_initial_commit(
+        self,
+        actor_id: str,
+        installation_id: int,
+        owner: str,
+        repo: str,
+        branch: str,
+        files: list[ProjectFile],
+    ) -> str:
+        commit_sha = await self.gateway.create_initial_commit(
+            owner,
+            repo,
+            branch,
+            files,
+            "chore: import Apps Script project",
+            await self.auth.token_for(installation_id),
+        )
+        self.audit_repository.append(
+            AuditEvent(
+                actor_id=actor_id,
+                action="INITIAL_IMPORT_COMMITTED",
+                repository=f"{owner}/{repo}",
+                branch=branch,
+                metadata={"commit_sha": commit_sha, "file_count": len(files)},
+            )
+        )
+        return commit_sha
+
+    async def get_snapshot(
+        self, installation_id: int, owner: str, repo: str, branch: str, script_id: str
+    ) -> ProjectSnapshot:
+        files = await self.gateway.list_repository_files(
+            owner, repo, branch, await self.auth.token_for(installation_id)
+        )
+        return create_github_snapshot(script_id, files)

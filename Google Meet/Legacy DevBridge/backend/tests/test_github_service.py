@@ -6,6 +6,7 @@ import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
+from app.appsscript.models import ProjectFile
 from app.audit.repository import InMemoryAuditRepository
 from app.github.auth import (
     GitHubInstallationAuth,
@@ -94,6 +95,20 @@ class FakeGateway:
     async def get_file(self, owner: str, repo: str, path: str, ref: str, token: str) -> GitHubFile:
         self.tokens.append(token)
         return GitHubFile(path=path, name="Code.gs", sha="b" * 40, content="function run() {}")
+
+    async def create_initial_commit(
+        self,
+        owner: str,
+        repo: str,
+        branch: str,
+        files: list[ProjectFile],
+        message: str,
+        token: str,
+    ) -> str:
+        self.tokens.append(token)
+        assert files
+        assert message == "chore: import Apps Script project"
+        return "c" * 40
 
 
 def build_service() -> tuple[

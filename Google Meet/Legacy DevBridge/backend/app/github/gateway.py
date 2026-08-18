@@ -3,6 +3,7 @@ from typing import Any, Protocol
 
 import httpx
 
+from app.appsscript.models import ProjectFile
 from app.github.auth import GitHubAppClient
 from app.github.errors import (
     GitHubConnectionExpiredError,
@@ -35,6 +36,18 @@ class GitHubGateway(Protocol):
     async def get_file(
         self, owner: str, repo: str, path: str, ref: str, token: str
     ) -> GitHubFile: ...
+    async def create_initial_commit(
+        self,
+        owner: str,
+        repo: str,
+        branch: str,
+        files: list[ProjectFile],
+        message: str,
+        token: str,
+    ) -> str: ...
+    async def list_repository_files(
+        self, owner: str, repo: str, ref: str, token: str
+    ) -> list[GitHubFile]: ...
 
 
 class HttpGitHubGateway(GitHubAppClient):
@@ -107,6 +120,57 @@ class HttpGitHubGateway(GitHubAppClient):
             sha=payload["sha"],
             content=decoded,
         )
+
+    async def create_initial_commit(
+        self,
+        owner: str,
+        repo: str,
+        branch: str,
+        files: list[ProjectFile],
+        message: str,
+        token: str,
+    ) -> str:
+        tree_items: list[dict[str, str]] = []
+        for file in files:
+            blob = await self._request(
+                "POST",
+                f"/repos/{owner}/{repo}/git/blobs",
+                token,
+                json={"content": file.content, "encoding": "utf-8"},
+            )
+            tree_items.append(
+                {"path": file.path, "mode": "100644", "type": "blob", "sha": blob["sha"]}
+            )
+        tree = await self._request(
+            "POST", f"/repos/{owner}/{repo}/git/trees", token, json={"tree": tree_items}
+        )
+        commit = await self._request(
+            "POST",
+            f"/repos/{owner}/{repo}/git/commits",
+            token,
+            json={"message": message, "tree": tree["sha"], "parents": []},
+        )
+        await self._request(
+            "POST",
+            f"/repos/{owner}/{repo}/git/refs",
+            token,
+            json={"ref": f"refs/heads/{branch}", "sha": commit["sha"]},
+        )
+        result: str = commit["sha"]
+        return result
+
+    async def list_repository_files(
+        self, owner: str, repo: str, ref: str, token: str
+    ) -> list[GitHubFile]:
+        payload = await self._request(
+            "GET", f"/repos/{owner}/{repo}/git/trees/{ref}?recursive=1", token
+        )
+        tree = payload.get("tree", [])
+        files: list[GitHubFile] = []
+        for item in tree:
+            if item.get("type") == "blob":
+                files.append(await self.get_file(owner, repo, item["path"], ref, token))
+        return files
 
     async def _request(
         self, method: str, path: str, token: str, json: dict[str, object] | None = None
