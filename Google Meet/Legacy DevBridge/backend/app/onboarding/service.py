@@ -25,6 +25,12 @@ class OnboardingService:
         state.google_connected = True
         return self.repository.save(self._refresh(state))
 
+    def connect_google_live(self, user_id: str) -> UserSetupState:
+        state = self.repository.get(user_id)
+        state.google_connected = True
+        state.connection_mode = "GOOGLE_OAUTH"
+        return self.repository.save(self._refresh(state))
+
     def connect_github(self, user_id: str) -> UserSetupState:
         state = self._mock_state(user_id)
         if not state.google_connected:

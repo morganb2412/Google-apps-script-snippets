@@ -1,0 +1,1 @@
+"""Sanitized audit event domain."""

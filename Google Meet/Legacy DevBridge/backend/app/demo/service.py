@@ -192,9 +192,11 @@ class DemoWorkspaceService:
 
     @staticmethod
     def _diff(path: str, local: str | None, remote: str | None) -> str:
-        return "".join(unified_diff(
-            (remote or "").splitlines(keepends=True),
-            (local or "").splitlines(keepends=True),
-            fromfile=f"github/{path}",
-            tofile=f"appsscript/{path}",
-        ))
+        return "".join(
+            unified_diff(
+                (remote or "").splitlines(keepends=True),
+                (local or "").splitlines(keepends=True),
+                fromfile=f"github/{path}",
+                tofile=f"appsscript/{path}",
+            )
+        )

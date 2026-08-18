@@ -5,6 +5,7 @@ import {
   getOnboardingStatus,
   registerDetectedProject,
   selectRecommendedStandards,
+  startGoogleConnection,
 } from "../services/apiClient";
 import type { OnboardingState, UserSetupState } from "../types/onboarding";
 import type { ProjectContext } from "../types/project";
@@ -54,7 +55,9 @@ export function useOnboarding(project: ProjectContext | null): [OnboardingState,
   }, []);
 
   return [state, {
-    connectGoogle: () => perform(() => connectOnboardingProvider("google")),
+    connectGoogle: () => perform(import.meta.env.DEV
+      ? () => connectOnboardingProvider("google")
+      : startGoogleConnection),
     connectGitHub: () => perform(() => connectOnboardingProvider("github")),
     useProject: () => project ? perform(() => registerDetectedProject(project)) : Promise.resolve(),
     configureStandards: () => perform(selectRecommendedStandards),

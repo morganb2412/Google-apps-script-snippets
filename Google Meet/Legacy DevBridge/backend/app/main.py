@@ -17,7 +17,7 @@ def create_app() -> FastAPI:
     settings = get_settings()
     application = FastAPI(
         title="Legacy DevBridge API",
-        version="0.6.0",
+        version="0.7.0",
         docs_url="/docs" if settings.environment != "production" else None,
         redoc_url=None,
         lifespan=lifespan,
@@ -28,7 +28,12 @@ def create_app() -> FastAPI:
         allow_origin_regex=settings.cors_origin_regex,
         allow_credentials=True,
         allow_methods=["GET", "POST"],
-        allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+        allow_headers=[
+            "Authorization",
+            "Content-Type",
+            "X-DevBridge-Session",
+            "X-Request-ID",
+        ],
     )
     application.include_router(api_router, prefix="/api/v1")
     return application
