@@ -49,6 +49,21 @@ npm run build
 
 Load `extension/dist` via Chrome's **Extensions > Developer mode > Load unpacked**. The extension is scoped to `https://script.google.com/*` and calls the API base configured through `VITE_API_BASE_URL`.
 
+### Test in Apps Script
+
+1. Build the extension with `npm run build` from `extension/`.
+2. Open `chrome://extensions`, enable **Developer mode**, and choose **Load unpacked**.
+3. Select the `extension/dist` directory.
+4. Open or reload a project at `https://script.google.com/home/projects/<project-id>/edit`.
+5. Pin and click **Legacy DevBridge** in Chrome's extension menu.
+6. Confirm the side panel shows the project title and ID. The repository remains **Not connected** until the GitHub integration milestone.
+
+Version 0.4 includes the isolated Apps Script toolbar plus a guided local onboarding flow for Google, GitHub, detected project, and recommended standards. Google and GitHub connections are explicitly mocked only when the backend runs in local mode.
+
+After rebuilding, use the extension card's **Reload** button and reload the Apps Script tab so its content script is refreshed.
+
+For tenant-only distribution, build the private package with `npm run package:private` and follow [docs/private-tenant-deployment.md](docs/private-tenant-deployment.md). The listing should use private domain visibility and a pilot Google Group; it does not need to be public.
+
 ## Configuration
 
 Copy `.env.example` to `.env` for local development. Never commit `.env` or credentials. Production secrets belong in Google Secret Manager and are injected into Cloud Run.
@@ -59,7 +74,7 @@ Google OAuth and GitHub App credentials will be handled server-side. The browser
 
 ## Current status
 
-Milestone 1 includes the API health endpoint, extension navigation shell and API status, shared schema, tests, lint/type/build configuration, container, Cloud Build definition, CI, standards, and architecture/security documentation. Real account connections and project detection begin in later milestones.
+Milestones 1–2 include the API health endpoint, typed Apps Script context validation, MV3 side-panel shell, Apps Script editor project detection, tab-scoped extension messaging, shared schema, tests, lint/type/build configuration, Cloud Run packaging, CI, standards, and architecture/security documentation. Real Google OAuth, source retrieval, and GitHub connections remain later milestones.
 
 ## Roadmap
 

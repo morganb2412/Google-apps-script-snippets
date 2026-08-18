@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     environment: str = "local"
     log_level: str = "INFO"
     cors_origins_raw: str = "https://script.google.com"
+    cors_origin_regex: str = r"^chrome-extension://[a-p]{32}$"
 
     @property
     def cors_origins(self) -> list[str]:

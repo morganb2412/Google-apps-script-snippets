@@ -5,6 +5,10 @@
 **/.env
 **/.venv
 backend/.venv/
+backend/.mypy_cache/
+backend/.pytest_cache/
+backend/.ruff_cache/
+backend/pytest-cache-files-*/
 **/__pycache__
 **/.pytest_cache
 **/node_modules
