@@ -1,0 +1,15 @@
+.gcloudignore
+.git
+.gitignore
+.env
+**/.env
+**/.venv
+backend/.venv/
+**/__pycache__
+**/.pytest_cache
+**/node_modules
+extension/node_modules/
+**/dist
+extension/dist/
+**/*.pyc
+**/*.tsbuildinfo
