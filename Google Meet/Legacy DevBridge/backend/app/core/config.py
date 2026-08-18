@@ -15,6 +15,10 @@ class Settings(BaseSettings):
     google_oauth_client_secret: str = ""
     google_oauth_redirect_uri: str = "http://127.0.0.1:8000/api/v1/onboarding/google/callback"
     google_allowed_domains_raw: str = ""
+    github_app_enabled: bool = False
+    github_app_id: str = ""
+    github_app_private_key: str = ""
+    github_app_name: str = ""
 
     @property
     def cors_origins(self) -> list[str]:

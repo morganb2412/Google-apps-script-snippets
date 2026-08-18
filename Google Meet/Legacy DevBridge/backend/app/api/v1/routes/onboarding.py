@@ -18,6 +18,12 @@ from app.auth.service import (
     GoogleTenantDeniedError,
 )
 from app.core.config import Settings, get_settings
+from app.github.auth import (
+    GitHubInstallationFlow,
+    GitHubInstallationStateError,
+    InMemoryGitHubInstallationRepository,
+)
+from app.github.models import GitHubInstallStart
 from app.onboarding.health import build_integration_health
 from app.onboarding.models import (
     ConnectionRequest,
@@ -37,6 +43,8 @@ router = APIRouter(prefix="/onboarding", tags=["onboarding"])
 _repository = InMemoryOnboardingRepository()
 _google_credentials = InMemoryGoogleCredentialRepository()
 _audit_repository = InMemoryAuditRepository()
+_github_installation_flows: dict[str, GitHubInstallationFlow] = {}
+_github_installations = InMemoryGitHubInstallationRepository()
 
 
 def get_session_id(
@@ -86,6 +94,23 @@ def get_google_oauth_service(
 
 
 GoogleService = Annotated[GoogleOAuthService, Depends(get_google_oauth_service)]
+
+
+def get_github_installation_flow(
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> GitHubInstallationFlow:
+    if not settings.github_app_enabled or not settings.github_app_name:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="GitHub connection is not configured yet.",
+        )
+    return _github_installation_flows.setdefault(
+        settings.github_app_name,
+        GitHubInstallationFlow(settings.github_app_name, _github_installations),
+    )
+
+
+GitHubFlow = Annotated[GitHubInstallationFlow, Depends(get_github_installation_flow)]
 
 
 @router.get("/status", response_model=UserSetupState)
@@ -146,6 +171,35 @@ async def connect_github(
     return _execute_for(service.connect_github, session_id)
 
 
+@router.get("/github/start", response_model=GitHubInstallStart)
+async def start_github_installation(flow: GitHubFlow, session_id: SessionId) -> GitHubInstallStart:
+    return flow.start(session_id)
+
+
+@router.get("/github/callback", response_class=HTMLResponse)
+async def complete_github_installation(
+    flow: GitHubFlow,
+    onboarding: Service,
+    installation_id: Annotated[int, Query(gt=0)],
+    state_value: Annotated[str, Query(alias="state", min_length=20, max_length=512)],
+) -> HTMLResponse:
+    try:
+        session_id = flow.complete(state_value, installation_id)
+        onboarding.connect_github_live(session_id)
+        _audit_repository.append(
+            AuditEvent(
+                actor_id=session_id,
+                action="GITHUB_CONNECTED",
+                metadata={"installation_id": installation_id},
+            )
+        )
+    except GitHubInstallationStateError as error:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error)) from error
+    except OnboardingPreconditionError as error:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
+    return HTMLResponse(_connection_completion_page("GitHub"))
+
+
 @router.post("/project", response_model=UserSetupState)
 async def detect_project(
     _: ProjectDetectedRequest, service: Service, session_id: SessionId
@@ -187,12 +241,16 @@ def _execute_for(operation: Callable[[str], UserSetupState], session_id: str) ->
 
 
 def _oauth_completion_page() -> str:
-    return """<!doctype html>
+    return _connection_completion_page("Google")
+
+
+def _connection_completion_page(provider: str) -> str:
+    return f"""<!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><title>DevBridge connected</title></head>
 <body>
 <main>
-  <h1>Google connected</h1>
+  <h1>{provider} connected</h1>
   <p>You can close this tab and return to Apps Script.</p>
 </main>
 <script>window.setTimeout(() => window.close(), 1200);</script>

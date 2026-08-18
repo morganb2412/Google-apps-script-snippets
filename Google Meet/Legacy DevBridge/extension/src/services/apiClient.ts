@@ -29,6 +29,11 @@ interface GoogleOAuthStart {
   expires_at: string;
 }
 
+interface GitHubInstallStart {
+  installation_url: string;
+  expires_at: string;
+}
+
 export async function startGoogleConnection(): Promise<UserSetupState> {
   const started = await request<GoogleOAuthStart>("/onboarding/google/start", {});
   await chrome.tabs.create({ url: started.authorization_url, active: true });
@@ -39,6 +44,18 @@ export async function startGoogleConnection(): Promise<UserSetupState> {
     if (setup.google_connected) return setup;
   }
   throw new Error("Google connection timed out. Return to DevBridge and try again.");
+}
+
+export async function startGitHubConnection(): Promise<UserSetupState> {
+  const started = await request<GitHubInstallStart>("/onboarding/github/start", {});
+  await chrome.tabs.create({ url: started.installation_url, active: true });
+  const deadline = Math.min(Date.parse(started.expires_at), Date.now() + 10 * 60_000);
+  while (Date.now() < deadline) {
+    await new Promise((resolve) => window.setTimeout(resolve, 1500));
+    const setup = await getOnboardingStatus();
+    if (setup.github_connected) return setup;
+  }
+  throw new Error("GitHub connection timed out. Return to DevBridge and try again.");
 }
 
 export async function registerDetectedProject(project: ProjectContext): Promise<UserSetupState> {

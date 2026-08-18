@@ -19,7 +19,7 @@ export function OnboardingWizard({ state, actions, project }: { state: Onboardin
       run: actions.connectGoogle,
       disabled: false,
     },
-    GITHUB: { title: "Connect GitHub", description: "GitHub App connection is implemented in the next tracked milestone.", action: "Connect GitHub (local mock)", run: actions.connectGitHub, disabled: !import.meta.env.DEV },
+    GITHUB: { title: "Connect GitHub", description: localMock ? "Local development records an explicit mock installation." : "DevBridge opens the private GitHub App installation page. Installation tokens remain server-side.", action: localMock ? "Connect GitHub (local mock)" : "Connect GitHub", run: actions.connectGitHub, disabled: false },
     PROJECT: { title: project ? `Use ${project.name ?? "this Apps Script project"}` : "Open an Apps Script project", description: project ? "Confirm the project detected by the DevBridge toolbar." : "DevBridge needs an active Apps Script editor tab.", action: "Use detected project", run: actions.useProject, disabled: !project },
     REPOSITORY: { title: "Repository setup is next", description: "Repository creation and selection arrive in the GitHub integration milestones.", action: "Continue", run: actions.configureStandards, disabled: true },
     STANDARDS: { title: "Choose engineering standards", description: "Start with secure recommended defaults. These can be customized later.", action: "Use recommended standards", run: actions.configureStandards, disabled: false },

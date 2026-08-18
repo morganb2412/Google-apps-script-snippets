@@ -1,0 +1,1 @@
+"""GitHub App integration domain."""

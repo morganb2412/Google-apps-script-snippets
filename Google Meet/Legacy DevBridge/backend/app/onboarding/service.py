@@ -38,6 +38,14 @@ class OnboardingService:
         state.github_connected = True
         return self.repository.save(self._refresh(state))
 
+    def connect_github_live(self, user_id: str) -> UserSetupState:
+        state = self.repository.get(user_id)
+        if not state.google_connected:
+            raise OnboardingPreconditionError("Connect Google before GitHub.")
+        state.github_connected = True
+        state.connection_mode = "LIVE_CONNECTIONS"
+        return self.repository.save(self._refresh(state))
+
     def detect_project(self, user_id: str) -> UserSetupState:
         state = self.repository.get(user_id)
         state.project_detected = True
