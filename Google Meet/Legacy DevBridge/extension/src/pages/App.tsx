@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { Navigation } from "../components/Navigation";
 import { ProjectOverview } from "../components/ProjectOverview";
 import { OnboardingWizard } from "../components/OnboardingWizard";
+import { DemoView } from "../components/DemoViews";
 import { StatusBadge } from "../components/StatusBadge";
 import { useApiHealth } from "../hooks/useApiHealth";
 import { useProjectContext } from "../hooks/useProjectContext";
 import { useOnboarding } from "../hooks/useOnboarding";
+import { useDemoWorkspace } from "../hooks/useDemoWorkspace";
 import type { Section } from "../types/navigation";
 import type { ExtensionMessage } from "../types/project";
 
@@ -15,6 +17,7 @@ export function App() {
   const projectState = useProjectContext();
   const detectedProject = projectState.status === "detected" ? projectState.project : null;
   const [onboardingState, onboardingActions] = useOnboarding(detectedProject);
+  const demo = useDemoWorkspace();
   useEffect(() => {
     const navigate = (message: ExtensionMessage) => {
       if (message.type === "DEVBRIDGE_NAVIGATE") setActive(message.section);
@@ -27,7 +30,7 @@ export function App() {
     <Navigation active={active} onSelect={setActive} />
     <section className="panel">
       <p className="eyebrow">{active.toUpperCase()}</p>
-      {active === "Project" ? <><OnboardingWizard state={onboardingState} actions={onboardingActions} project={detectedProject} /><ProjectOverview state={projectState} apiState={apiState} /></> : <><h2>{active} foundation ready</h2><p className="muted">This section is intentionally scaffolded for its planned milestone.</p></>}
+      {active === "Project" ? <><OnboardingWizard state={onboardingState} actions={onboardingActions} project={detectedProject} /><ProjectOverview state={projectState} apiState={apiState} /></> : <DemoView section={active} workspace={demo.workspace} actions={demo} />}
     </section>
     <footer>Secure by design · Human approval required</footer>
   </main>;

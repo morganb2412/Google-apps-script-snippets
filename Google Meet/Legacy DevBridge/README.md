@@ -58,7 +58,7 @@ Load `extension/dist` via Chrome's **Extensions > Developer mode > Load unpacked
 5. Pin and click **Legacy DevBridge** in Chrome's extension menu.
 6. Confirm the side panel shows the project title and ID. The repository remains **Not connected** until the GitHub integration milestone.
 
-Version 0.4 includes the isolated Apps Script toolbar plus a guided local onboarding flow for Google, GitHub, detected project, and recommended standards. Google and GitHub connections are explicitly mocked only when the backend runs in local mode.
+Version 0.5 includes the isolated Apps Script toolbar, guided onboarding, and an explicitly labeled Demo Workspace covering repository, branch, commit, pull request, comparison/diff, AI PLAN/REVIEW, standards, and health workflows. Demo actions perform no external writes. Follow [docs/demo-script.md](docs/demo-script.md).
 
 After rebuilding, use the extension card's **Reload** button and reload the Apps Script tab so its content script is refreshed.
 

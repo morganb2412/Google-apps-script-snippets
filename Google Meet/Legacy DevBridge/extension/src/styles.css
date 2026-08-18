@@ -29,6 +29,23 @@ nav { display: flex; overflow-x: auto; gap: 4px; margin: 22px 0 16px; border-bot
 .setup-progress__fill { display: block; height: 100%; background: #66adff; transition: width .2s ease; }
 .setup-error { color: #ffb7a8; font-size: 12px; }
 .secondary { padding: 8px 11px; border: 1px solid #43566f; border-radius: 6px; color: #dce6f2; background: transparent; cursor: pointer; }
+.demo-label { color: #f0aa55; font-size: 10px; font-weight: 700; letter-spacing: .1em; }
+.repo-name { font-family: ui-monospace, monospace; font-size: 15px; }
+.button-row { display: flex; flex-wrap: wrap; gap: 7px; margin: 12px 0; }
+.selected { border-color: #66adff; background: #1d3856; }
+.success-line { color: #69d6a3; font-size: 12px; }
+.count { color: #66adff; }
+.changes-list { display: grid; gap: 5px; margin: 14px 0; }
+.change { display: grid; grid-template-columns: 20px 1fr auto; gap: 7px; padding: 10px; border: 1px solid #27374b; border-radius: 6px; color: #dce5ef; text-align: left; background: #111925; cursor: pointer; }
+.change--active { border-color: #538bc5; background: #17273a; }
+.change small { color: #f0aa55; font-size: 9px; }
+.risk { color: #f0aa55; font-size: 11px; }
+.diff { max-height: 260px; overflow: auto; padding: 12px; border-radius: 6px; color: #c5d2e0; background: #080d14; font: 10px/1.45 ui-monospace, monospace; white-space: pre-wrap; }
+textarea { width: 100%; min-height: 88px; padding: 10px; border: 1px solid #34465d; border-radius: 6px; color: #e3ebf4; background: #0c131d; resize: vertical; }
+.agent-result { margin-top: 16px; padding: 14px; border: 1px solid #31465f; border-radius: 7px; background: #101a27; }
+.agent-result li { margin-bottom: 8px; color: #b9c7d6; }
+.standard, .health-row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #233145; }
+.standard { justify-content: flex-start; }.standard span { color: #35c98a; }.health-row strong { color: #9eb2c8; font-size: 12px; }
 .status { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: #aebdce; }
 .status__dot { width: 7px; height: 7px; border-radius: 50%; background: #76859a; }
 .status--good .status__dot { background: #35c98a; } .status--warning .status__dot { background: #f0aa55; }

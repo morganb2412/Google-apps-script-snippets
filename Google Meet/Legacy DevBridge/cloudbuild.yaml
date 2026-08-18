@@ -1,7 +1,7 @@
 substitutions:
   _REGION: us-central1
   _SERVICE: legacy-devbridge-api
-  _TAG: milestone-3
+  _TAG: demo-preview
 steps:
   - name: gcr.io/cloud-builders/docker
     args: ["build", "-t", "${_REGION}-docker.pkg.dev/${PROJECT_ID}/legacy-devbridge/api:${_TAG}", "backend"]

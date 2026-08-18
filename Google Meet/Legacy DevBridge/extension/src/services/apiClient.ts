@@ -1,6 +1,7 @@
 import type { HealthResponse } from "../types/health";
 import type { ProjectContext } from "../types/project";
 import type { UserSetupState } from "../types/onboarding";
+import type { AgentResult, DemoWorkspace } from "../types/demo";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000/api/v1";
 
@@ -50,3 +51,12 @@ async function request<T>(path: string, init: RequestInit): Promise<T> {
   }
   return response.json() as Promise<T>;
 }
+
+export const demoApi = {
+  workspace: () => request<DemoWorkspace>("/demo/workspace", {}),
+  connect: () => request<DemoWorkspace>("/demo/connect", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ owner: "legacy-automations", repository: "atlas-demo" }) }),
+  branch: (name: string) => request<DemoWorkspace>("/demo/branches", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) }),
+  commit: (message: string) => request<DemoWorkspace>("/demo/commits", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message }) }),
+  pullRequest: () => request<DemoWorkspace>("/demo/pull-requests", { method: "POST" }),
+  agent: (mode: "plan" | "review", userRequest: string) => request<AgentResult>(`/demo/agent/${mode}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ request: userRequest }) }),
+};
