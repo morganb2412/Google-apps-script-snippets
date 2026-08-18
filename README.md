@@ -1,4 +1,9 @@
-Workspace Automation Scripts
+# Workspace Automation Scripts
+
+## Legacy DevBridge
+
+The production-oriented DevBridge platform foundation now lives in [`Google Meet/Legacy DevBridge/`](Google%20Meet/Legacy%20DevBridge/README.md). It is isolated from the existing snippet collection and has separate backend and extension CI workflows.
+
  A community-driven collection of Google Apps Script snippets and automation tools designed to save time and boost productivity in Google Workspace.
 
 This repository includes scripts for:

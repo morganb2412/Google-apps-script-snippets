@@ -1,0 +1,20 @@
+name: DevBridge Backend CI
+on:
+  push:
+    paths: ["Google Meet/Legacy DevBridge/backend/**", ".github/workflows/backend-ci.yml"]
+  pull_request:
+    paths: ["Google Meet/Legacy DevBridge/backend/**", ".github/workflows/backend-ci.yml"]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Google Meet/Legacy DevBridge/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip, cache-dependency-path: "Google Meet/Legacy DevBridge/backend/requirements-dev.txt" }
+      - run: python -m pip install -r requirements-dev.txt
+      - run: ruff check .
+      - run: mypy app
+      - run: pytest

@@ -1,0 +1,23 @@
+substitutions:
+  _REGION: us-central1
+  _SERVICE: legacy-devbridge-api
+  _TAG: milestone-1
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-t", "${_REGION}-docker.pkg.dev/${PROJECT_ID}/legacy-devbridge/api:${_TAG}", "backend"]
+  - name: gcr.io/cloud-builders/docker
+    args: ["push", "${_REGION}-docker.pkg.dev/${PROJECT_ID}/legacy-devbridge/api:${_TAG}"]
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - ${_SERVICE}
+      - --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/legacy-devbridge/api:${_TAG}
+      - --region=${_REGION}
+      - --platform=managed
+      - --no-allow-unauthenticated
+images:
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/legacy-devbridge/api:${_TAG}
+options:
+  logging: CLOUD_LOGGING_ONLY

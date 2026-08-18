@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://legacy.devbridge/schemas/health.schema.json",
+  "title": "HealthResponse",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "service", "version", "timestamp"],
+  "properties": {
+    "status": { "const": "ok" },
+    "service": { "type": "string" },
+    "version": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" }
+  }
+}
