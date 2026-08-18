@@ -12,10 +12,15 @@ from app.github.errors import (
 )
 from app.github.models import (
     CreateBranchRequest,
+    CreateCommitRequest,
+    CreatePullRequestRequest,
     CreateRepositoryRequest,
+    GitFileOperation,
     GitHubBranch,
+    GitHubCommit,
     GitHubFile,
     GitHubOwner,
+    GitHubPullRequest,
     GitHubRepository,
     InstallationToken,
 )
@@ -48,6 +53,12 @@ class GitHubGateway(Protocol):
     async def list_repository_files(
         self, owner: str, repo: str, ref: str, token: str
     ) -> list[GitHubFile]: ...
+    async def create_commit(
+        self, owner: str, repo: str, request: CreateCommitRequest, token: str
+    ) -> GitHubCommit: ...
+    async def create_pull_request(
+        self, owner: str, repo: str, request: CreatePullRequestRequest, token: str
+    ) -> GitHubPullRequest: ...
 
 
 class HttpGitHubGateway(GitHubAppClient):
@@ -171,6 +182,73 @@ class HttpGitHubGateway(GitHubAppClient):
             if item.get("type") == "blob":
                 files.append(await self.get_file(owner, repo, item["path"], ref, token))
         return files
+
+    async def create_commit(
+        self, owner: str, repo: str, request: CreateCommitRequest, token: str
+    ) -> GitHubCommit:
+        tree_items: list[dict[str, str | None]] = []
+        for change in request.changes:
+            if change.operation == GitFileOperation.DELETE:
+                tree_items.append(
+                    {"path": change.path, "mode": "100644", "type": "blob", "sha": None}
+                )
+                continue
+            blob = await self._request(
+                "POST",
+                f"/repos/{owner}/{repo}/git/blobs",
+                token,
+                json={"content": change.content or "", "encoding": "utf-8"},
+            )
+            tree_items.append(
+                {"path": change.path, "mode": "100644", "type": "blob", "sha": blob["sha"]}
+            )
+        tree = await self._request(
+            "POST",
+            f"/repos/{owner}/{repo}/git/trees",
+            token,
+            json={"base_tree": request.expected_head_sha, "tree": tree_items},
+        )
+        commit = await self._request(
+            "POST",
+            f"/repos/{owner}/{repo}/git/commits",
+            token,
+            json={
+                "message": request.message,
+                "tree": tree["sha"],
+                "parents": [request.expected_head_sha],
+            },
+        )
+        await self._request(
+            "PATCH",
+            f"/repos/{owner}/{repo}/git/refs/heads/{request.branch}",
+            token,
+            json={"sha": commit["sha"], "force": False},
+        )
+        return GitHubCommit(sha=commit["sha"], html_url=commit["html_url"])
+
+    async def create_pull_request(
+        self, owner: str, repo: str, request: CreatePullRequestRequest, token: str
+    ) -> GitHubPullRequest:
+        payload = await self._request(
+            "POST",
+            f"/repos/{owner}/{repo}/pulls",
+            token,
+            json={
+                "title": request.title,
+                "body": request.body,
+                "head": request.head,
+                "base": request.base,
+            },
+        )
+        return GitHubPullRequest(
+            number=payload["number"],
+            title=payload["title"],
+            html_url=payload["html_url"],
+            head=payload["head"]["ref"],
+            base=payload["base"]["ref"],
+            changed_files=payload.get("changed_files", 0),
+            validation_summary=request.validation_summary,
+        )
 
     async def _request(
         self, method: str, path: str, token: str, json: dict[str, object] | None = None

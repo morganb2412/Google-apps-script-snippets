@@ -16,11 +16,17 @@ from app.github.auth import (
     PyJwtGitHubSigner,
 )
 from app.github.models import (
+    CommitFileChange,
     CreateBranchRequest,
+    CreateCommitRequest,
+    CreatePullRequestRequest,
     CreateRepositoryRequest,
+    GitFileOperation,
     GitHubBranch,
+    GitHubCommit,
     GitHubFile,
     GitHubOwner,
+    GitHubPullRequest,
     GitHubRepository,
     InstallationToken,
 )
@@ -55,6 +61,7 @@ class FakeAppClient:
 class FakeGateway:
     def __init__(self) -> None:
         self.tokens: list[str] = []
+        self.commit_calls = 0
 
     @staticmethod
     def repository(name: str = "atlas") -> GitHubRepository:
@@ -84,7 +91,10 @@ class FakeGateway:
 
     async def list_branches(self, owner: str, repo: str, token: str) -> list[GitHubBranch]:
         self.tokens.append(token)
-        return [GitHubBranch(name="main", commit_sha="a" * 40, protected=True)]
+        return [
+            GitHubBranch(name="main", commit_sha="a" * 40, protected=True),
+            GitHubBranch(name="feature/safe", commit_sha="b" * 40),
+        ]
 
     async def create_branch(
         self, owner: str, repo: str, request: CreateBranchRequest, token: str
@@ -109,6 +119,30 @@ class FakeGateway:
         assert files
         assert message == "chore: import Apps Script project"
         return "c" * 40
+
+    async def create_commit(
+        self, owner: str, repo: str, request: CreateCommitRequest, token: str
+    ) -> GitHubCommit:
+        self.tokens.append(token)
+        self.commit_calls += 1
+        return GitHubCommit(
+            sha="c" * 40,
+            html_url="https://github.com/acme/atlas/commit/cccc",
+        )
+
+    async def create_pull_request(
+        self, owner: str, repo: str, request: CreatePullRequestRequest, token: str
+    ) -> GitHubPullRequest:
+        self.tokens.append(token)
+        return GitHubPullRequest(
+            number=7,
+            title=request.title,
+            html_url="https://github.com/acme/atlas/pull/7",
+            head=request.head,
+            base=request.base,
+            changed_files=2,
+            validation_summary=request.validation_summary,
+        )
 
 
 def build_service() -> tuple[
@@ -204,3 +238,72 @@ def test_github_app_signer_creates_short_lived_rs256_jwt() -> None:
         issuer="12345",
     )
     assert claims["exp"] - claims["iat"] <= 600
+
+
+def commit_request(**changes: object) -> CreateCommitRequest:
+    values: dict[str, object] = {
+        "branch": "feature/safe",
+        "message": "feat: validate approvals",
+        "expected_head_sha": "b" * 40,
+        "approved": True,
+        "changes": [
+            CommitFileChange(
+                path="Code.gs",
+                operation=GitFileOperation.WRITE,
+                content="function run() { return true; }",
+            )
+        ],
+    }
+    values.update(changes)
+    return CreateCommitRequest.model_validate(values)
+
+
+def test_approved_feature_branch_commit_is_audited() -> None:
+    service, _, _, gateway, audit = build_service()
+    commit = asyncio.run(service.create_commit("actor", 42, "acme", "atlas", commit_request()))
+
+    assert commit.sha == "c" * 40
+    assert gateway.commit_calls == 1
+    event = audit.list_for_actor("actor")[0]
+    assert event.action == "COMMIT_CREATED"
+    assert event.metadata["file_count"] == 1
+
+
+@pytest.mark.parametrize(
+    ("commit_input", "message"),
+    [
+        (commit_request(approved=False), "approve"),
+        (commit_request(expected_head_sha="d" * 40), "branch changed"),
+        (commit_request(branch="main", expected_head_sha="a" * 40), "default branch"),
+    ],
+)
+def test_commit_policy_and_stale_head_fail_closed(
+    commit_input: CreateCommitRequest, message: str
+) -> None:
+    service, _, _, gateway, audit = build_service()
+    with pytest.raises(ValueError, match=message):
+        asyncio.run(service.create_commit("actor", 42, "acme", "atlas", commit_input))
+    assert gateway.commit_calls == 0
+    assert audit.list_for_actor("actor") == []
+
+
+def test_pull_request_requires_distinct_existing_branches_and_is_audited() -> None:
+    service, _, _, _, audit = build_service()
+    request = CreatePullRequestRequest(
+        title="Add approval validation",
+        body="Human-approved changes.",
+        head="feature/safe",
+        base="main",
+        validation_summary="Standards passed",
+    )
+    pull_request = asyncio.run(service.create_pull_request("actor", 42, "acme", "atlas", request))
+    assert pull_request.number == 7
+    assert pull_request.changed_files == 2
+    assert audit.list_for_actor("actor")[0].action == "PULL_REQUEST_CREATED"
+
+    with pytest.raises(ValueError, match="must be different"):
+        asyncio.run(
+            service.create_pull_request(
+                "actor", 42, "acme", "atlas", request.model_copy(update={"head": "main"})
+            )
+        )

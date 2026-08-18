@@ -5,10 +5,15 @@ from app.github.auth import GitHubInstallationAuth
 from app.github.gateway import GitHubGateway
 from app.github.models import (
     CreateBranchRequest,
+    CreateCommitRequest,
+    CreatePullRequestRequest,
     CreateRepositoryRequest,
     GitHubBranch,
+    GitHubCommit,
     GitHubFile,
+    GitHubPullRequest,
     GitHubRepository,
+    GitWorkflowPolicy,
 )
 from app.github.normalization import create_github_snapshot
 
@@ -118,3 +123,82 @@ class GitHubService:
             owner, repo, branch, await self.auth.token_for(installation_id)
         )
         return create_github_snapshot(script_id, files)
+
+    async def create_commit(
+        self,
+        actor_id: str,
+        installation_id: int,
+        owner: str,
+        repo: str,
+        request: CreateCommitRequest,
+        policy: GitWorkflowPolicy | None = None,
+    ) -> GitHubCommit:
+        if not request.approved:
+            raise ValueError("Review and approve the proposed changes before committing.")
+        repository = await self.get_repository(installation_id, owner, repo)
+        branches = await self.list_branches(installation_id, owner, repo)
+        branch = next((item for item in branches if item.name == request.branch), None)
+        if branch is None:
+            raise ValueError(
+                "The selected branch no longer exists. Refresh branches and try again."
+            )
+        if branch.commit_sha != request.expected_head_sha:
+            raise ValueError(
+                "The branch changed after review. Generate and approve a fresh push plan."
+            )
+        active_policy = policy or GitWorkflowPolicy()
+        if (
+            active_policy.prohibit_default_branch_commits
+            and request.branch == repository.default_branch
+        ):
+            raise ValueError(
+                "Direct commits to the default branch are prohibited. Create a feature branch."
+            )
+        if active_policy.prohibit_protected_branch_commits and branch.protected:
+            raise ValueError("Direct commits to this protected branch are prohibited.")
+        commit = await self.gateway.create_commit(
+            owner, repo, request, await self.auth.token_for(installation_id)
+        )
+        self.audit_repository.append(
+            AuditEvent(
+                actor_id=actor_id,
+                action="COMMIT_CREATED",
+                repository=f"{owner}/{repo}",
+                branch=request.branch,
+                metadata={"commit_sha": commit.sha, "file_count": len(request.changes)},
+            )
+        )
+        return commit
+
+    async def create_pull_request(
+        self,
+        actor_id: str,
+        installation_id: int,
+        owner: str,
+        repo: str,
+        request: CreatePullRequestRequest,
+    ) -> GitHubPullRequest:
+        if request.head == request.base:
+            raise ValueError("Pull request source and destination branches must be different.")
+        branches = await self.list_branches(installation_id, owner, repo)
+        names = {branch.name for branch in branches}
+        if request.head not in names or request.base not in names:
+            raise ValueError("Refresh branches before creating this pull request.")
+        pull_request = await self.gateway.create_pull_request(
+            owner, repo, request, await self.auth.token_for(installation_id)
+        )
+        self.audit_repository.append(
+            AuditEvent(
+                actor_id=actor_id,
+                action="PULL_REQUEST_CREATED",
+                repository=f"{owner}/{repo}",
+                branch=request.head,
+                metadata={
+                    "number": pull_request.number,
+                    "base": request.base,
+                    "changed_files": pull_request.changed_files,
+                    "validation_summary": pull_request.validation_summary,
+                },
+            )
+        )
+        return pull_request
