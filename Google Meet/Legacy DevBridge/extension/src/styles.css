@@ -22,6 +22,13 @@ nav { display: flex; overflow-x: auto; gap: 4px; margin: 22px 0 16px; border-bot
 .notice p { margin-bottom: 0; color: #98a8bb; line-height: 1.5; }
 .notice--warning { border-color: #684c2f; }
 .fine-print { color: #718298; font-size: 11px; line-height: 1.45; }
+.setup-card { margin-bottom: 20px; padding: 18px; border: 1px solid #315174; border-radius: 9px; background: #121f2e; }
+.setup-card--warning { border-color: #684c2f; }
+.setup-card h2 { margin-top: 7px; }
+.setup-progress { height: 3px; margin: -18px -18px 16px; overflow: hidden; border-radius: 9px 9px 0 0; background: #26364a; }
+.setup-progress__fill { display: block; height: 100%; background: #66adff; transition: width .2s ease; }
+.setup-error { color: #ffb7a8; font-size: 12px; }
+.secondary { padding: 8px 11px; border: 1px solid #43566f; border-radius: 6px; color: #dce6f2; background: transparent; cursor: pointer; }
 .status { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: #aebdce; }
 .status__dot { width: 7px; height: 7px; border-radius: 50%; background: #76859a; }
 .status--good .status__dot { background: #35c98a; } .status--warning .status__dot { background: #f0aa55; }

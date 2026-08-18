@@ -1,7 +1,7 @@
 substitutions:
   _REGION: us-central1
   _SERVICE: legacy-devbridge-api
-  _TAG: milestone-2
+  _TAG: milestone-3
 steps:
   - name: gcr.io/cloud-builders/docker
     args: ["build", "-t", "${_REGION}-docker.pkg.dev/${PROJECT_ID}/legacy-devbridge/api:${_TAG}", "backend"]
@@ -17,6 +17,7 @@ steps:
       - --region=${_REGION}
       - --platform=managed
       - --no-allow-unauthenticated
+      - --set-env-vars=DEVBRIDGE_ENV=production
 images:
   - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/legacy-devbridge/api:${_TAG}
 options:
