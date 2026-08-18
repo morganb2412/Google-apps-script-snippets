@@ -1,4 +1,5 @@
-export interface DemoChange { path: string; state: string; diff: string; requires_approval: boolean }
+export type SyncState = "IDENTICAL" | "LOCAL_MODIFIED" | "REMOTE_MODIFIED" | "LOCAL_ADDED" | "REMOTE_ADDED" | "LOCAL_DELETED" | "REMOTE_DELETED" | "CONFLICT";
+export interface DemoChange { path: string; state: SyncState; diff: string; requires_approval: boolean }
 export interface DemoWorkspace {
   mode: "DEMO"; project_name: string; script_id: string; repository: string | null; branch: string;
   branches: string[]; connected: boolean; changes: DemoChange[]; latest_commit: string | null;

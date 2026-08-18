@@ -17,7 +17,7 @@ def create_app() -> FastAPI:
     settings = get_settings()
     application = FastAPI(
         title="Legacy DevBridge API",
-        version="0.10.0",
+        version="0.11.0",
         docs_url="/docs" if settings.environment != "production" else None,
         redoc_url=None,
         lifespan=lifespan,

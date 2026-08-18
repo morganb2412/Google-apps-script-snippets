@@ -1,0 +1,1 @@
+"""Three-way synchronization domain."""
