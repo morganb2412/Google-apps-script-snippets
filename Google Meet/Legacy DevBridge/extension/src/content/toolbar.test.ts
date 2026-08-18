@@ -10,8 +10,8 @@ test("mounts one isolated Apps Script toolbar and opens the requested section", 
   expect(mountDevBridgeToolbar(onOpen)).toBe(host);
   const shadow = host.shadowRoot;
   expect(shadow).not.toBeNull();
-  const aiButton = Array.from(shadow?.querySelectorAll("button") ?? []).find((button) => button.textContent === "AI Engineer");
+  const aiButton = Array.from(shadow?.querySelectorAll("button") ?? []).find((button) => button.textContent === "Code Assistant");
   expect(aiButton).toBeDefined();
   fireEvent.click(aiButton as HTMLButtonElement);
-  expect(onOpen).toHaveBeenCalledWith("AI Engineer");
+  expect(onOpen).toHaveBeenCalledWith("Code Assistant");
 });

@@ -1,7 +1,7 @@
 import type { HealthResponse } from "../types/health";
 import type { ProjectContext } from "../types/project";
 import type { UserSetupState } from "../types/onboarding";
-import type { AgentResult, DemoWorkspace } from "../types/demo";
+import type { AgentResult, AssistantResponse, DemoWorkspace } from "../types/demo";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000/api/v1";
 
@@ -59,4 +59,6 @@ export const demoApi = {
   commit: (message: string) => request<DemoWorkspace>("/demo/commits", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message }) }),
   pullRequest: () => request<DemoWorkspace>("/demo/pull-requests", { method: "POST" }),
   agent: (mode: "plan" | "review", userRequest: string) => request<AgentResult>(`/demo/agent/${mode}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ request: userRequest }) }),
+  chat: (userRequest: string) => request<AssistantResponse>("/demo/assistant/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ request: userRequest }) }),
+  decide: (proposalId: string, approved: boolean) => request<AssistantResponse>(`/demo/assistant/${approved ? "approve" : "reject"}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ proposal_id: proposalId }) }),
 };

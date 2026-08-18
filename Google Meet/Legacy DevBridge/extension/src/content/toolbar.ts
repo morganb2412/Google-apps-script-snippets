@@ -5,7 +5,7 @@ export const TOOLBAR_HOST_ID = "legacy-devbridge-toolbar";
 const toolbarSections: Array<{ label: string; section: DevBridgeSection }> = [
   { label: "Project", section: "Project" },
   { label: "Changes", section: "Changes" },
-  { label: "AI Engineer", section: "AI Engineer" },
+  { label: "Code Assistant", section: "Code Assistant" },
 ];
 
 export function mountDevBridgeToolbar(onOpen: (section: DevBridgeSection) => void): HTMLElement {

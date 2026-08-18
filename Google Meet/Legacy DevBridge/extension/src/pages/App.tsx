@@ -32,6 +32,6 @@ export function App() {
       <p className="eyebrow">{active.toUpperCase()}</p>
       {active === "Project" ? <><OnboardingWizard state={onboardingState} actions={onboardingActions} project={detectedProject} /><ProjectOverview state={projectState} apiState={apiState} /></> : <DemoView section={active} workspace={demo.workspace} actions={demo} />}
     </section>
-    <footer>Secure by design · Human approval required</footer>
+    <footer>Code Assistant · Standards checked · Human approval required</footer>
   </main>;
 }

@@ -23,3 +23,15 @@ def test_demo_agent_reports_no_oauth_changes() -> None:
     assert result.mode == "DEMO"
     assert result.oauth_changes == []
     assert "ApprovalService.gs" in result.files_affected
+
+
+def test_code_assistant_requires_proposal_decision() -> None:
+    service = DemoWorkspaceService()
+    response = service.chat("Analyze standards and fix the hard-coded email")
+    assert response.proposal is not None
+    assert response.proposal.status == "PENDING_APPROVAL"
+    assert response.proposal.original_hash
+    approved = service.decide_proposal(approved=True)
+    assert approved.proposal is not None
+    assert approved.proposal.status == "APPROVED_DEMO"
+    assert "No external file was modified" in approved.message

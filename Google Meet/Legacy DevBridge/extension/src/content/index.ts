@@ -4,6 +4,15 @@ import { mountDevBridgeToolbar } from "./toolbar";
 
 let lastProjectKey = "";
 
+function safeSend(message: ExtensionMessage): void {
+  try {
+    void chrome.runtime.sendMessage(message).catch(() => undefined);
+  } catch {
+    // An unpacked extension reload invalidates previously injected contexts.
+    // Reloading the Apps Script tab injects the current content script.
+  }
+}
+
 function currentContext(): ProjectContext | null {
   return detectProjectContext(window.location.href, document.title);
 }
@@ -15,7 +24,7 @@ function publishContext(): void {
   if (projectKey === lastProjectKey) return;
   lastProjectKey = projectKey;
   const message: ExtensionMessage = { type: "DEVBRIDGE_PROJECT_CONTEXT", payload: context };
-  void chrome.runtime.sendMessage(message).catch(() => undefined);
+  safeSend(message);
 }
 
 chrome.runtime.onMessage.addListener((message: ExtensionMessage, _sender, sendResponse) => {
@@ -27,7 +36,7 @@ chrome.runtime.onMessage.addListener((message: ExtensionMessage, _sender, sendRe
 publishContext();
 mountDevBridgeToolbar((section) => {
   const message: ExtensionMessage = { type: "DEVBRIDGE_OPEN_PANEL", section };
-  void chrome.runtime.sendMessage(message).catch(() => undefined);
+  safeSend(message);
 });
 new MutationObserver(publishContext).observe(document.querySelector("title") ?? document.documentElement, {
   childList: true,

@@ -82,7 +82,7 @@ Milestones 1–2 include the API health endpoint, typed Apps Script context vali
 2. Guided onboarding and connection health
 3. Apps Script and GitHub service integrations
 4. Safe comparison/synchronization engine
-5. Source-control workflows and governed AI Engineer
+5. Source-control workflows and governed conversational Code Assistant
 
 ## Cloud Run
 

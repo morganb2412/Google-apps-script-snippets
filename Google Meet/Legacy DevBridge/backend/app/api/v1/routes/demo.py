@@ -3,11 +3,13 @@ from fastapi import APIRouter
 from app.demo.models import (
     AgentRequest,
     AgentResult,
+    AssistantResponse,
     BranchRequest,
     CommitRequest,
     ConnectDemoRequest,
     DemoFile,
     DemoWorkspace,
+    ProposalDecision,
 )
 from app.demo.service import DemoWorkspaceService
 
@@ -53,3 +55,18 @@ async def plan(request: AgentRequest) -> AgentResult:
 @router.post("/agent/review", response_model=AgentResult)
 async def review(request: AgentRequest) -> AgentResult:
     return _service.review(request.request)
+
+
+@router.post("/assistant/chat", response_model=AssistantResponse)
+async def assistant_chat(request: AgentRequest) -> AssistantResponse:
+    return _service.chat(request.request)
+
+
+@router.post("/assistant/approve", response_model=AssistantResponse)
+async def approve_proposal(_: ProposalDecision) -> AssistantResponse:
+    return _service.decide_proposal(approved=True)
+
+
+@router.post("/assistant/reject", response_model=AssistantResponse)
+async def reject_proposal(_: ProposalDecision) -> AssistantResponse:
+    return _service.decide_proposal(approved=False)

@@ -18,4 +18,4 @@ export type ExtensionMessage =
   | { type: "DEVBRIDGE_OPEN_PANEL"; section: DevBridgeSection }
   | { type: "DEVBRIDGE_NAVIGATE"; section: DevBridgeSection };
 
-export type DevBridgeSection = "Project" | "Repository" | "Changes" | "AI Engineer" | "Standards" | "Health";
+export type DevBridgeSection = "Project" | "Repository" | "Changes" | "Code Assistant" | "Standards" | "Health";

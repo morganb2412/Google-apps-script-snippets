@@ -65,3 +65,26 @@ class AgentResult(BaseModel):
     items: list[str]
     files_affected: list[str]
     oauth_changes: list[str] = Field(default_factory=list)
+
+
+class ProposedFix(BaseModel):
+    proposal_id: str = "demo-fix-001"
+    status: str = "PENDING_APPROVAL"
+    file: str = "ApprovalService.gs"
+    operation: str = "UPDATE"
+    original_hash: str
+    explanation: str
+    standards_impacted: list[str]
+    risk_level: str = "MEDIUM"
+    diff: str
+
+
+class AssistantResponse(BaseModel):
+    mode: str = "DEMO"
+    message: str
+    findings: list[str] = Field(default_factory=list)
+    proposal: ProposedFix | None = None
+
+
+class ProposalDecision(BaseModel):
+    proposal_id: str

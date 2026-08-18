@@ -1,3 +1,3 @@
-# AI Engineer
+# Code Assistant
 
-The AI runtime will be provider-neutral and receive a bounded `AgentContext`, not a repository dump. ASK, PLAN, and REVIEW are the initial modes. All generated modifications proceed through plan, structured proposal, diff, policy review, human approval, fresh-hash validation, application, verification, and audit.
+The conversational Code Assistant will be provider-neutral and receive a bounded `AgentContext`, not a repository dump. It answers project questions, analyzes security and company standards, and can prepare fixes. Every modification proceeds through conversation, structured proposal, diff, policy review, human approval, fresh-hash validation, application, verification, and audit.

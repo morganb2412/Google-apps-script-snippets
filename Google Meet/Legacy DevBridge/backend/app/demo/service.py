@@ -4,9 +4,11 @@ from hashlib import sha256
 
 from app.demo.models import (
     AgentResult,
+    AssistantResponse,
     DemoChange,
     DemoFile,
     DemoWorkspace,
+    ProposedFix,
     SyncState,
 )
 
@@ -46,6 +48,7 @@ function routeApproval(amount, requesterEmail) {
 class DemoWorkspaceService:
     def __init__(self) -> None:
         self.workspace = DemoWorkspace()
+        self.proposal_status = "PENDING_APPROVAL"
 
     def get(self) -> DemoWorkspace:
         self.workspace.changes = self.compare()
@@ -128,6 +131,64 @@ class DemoWorkspaceService:
             ],
             files_affected=["ApprovalService.gs", "ConfigService.gs"],
         )
+
+    def chat(self, request: str) -> AssistantResponse:
+        normalized = request.lower()
+        findings = [
+            "HIGH: Hard-coded finance@example.com violates configuration policy.",
+            "MEDIUM: Approval threshold should come from PropertiesService.",
+            "LOW: MailApp failures need structured logging.",
+        ]
+        fix_terms = ("fix", "change", "update", "implement", "refactor")
+        wants_fix = any(term in normalized for term in fix_terms)
+        proposal = self._proposal() if wants_fix else None
+        if proposal:
+            message = (
+                "I analyzed the project and prepared a governed fix. Review the diff below. "
+                "Nothing will be applied until you approve it, and the original file hash "
+                "will be checked again."
+            )
+        else:
+            message = (
+                "I analyzed the project against the company security and coding standards. "
+                "The main issue is hard-coded configuration in ApprovalService.gs. "
+                "Ask me to fix it when ready."
+            )
+        return AssistantResponse(message=message, findings=findings, proposal=proposal)
+
+    def decide_proposal(self, approved: bool) -> AssistantResponse:
+        self.proposal_status = "APPROVED_DEMO" if approved else "REJECTED"
+        action = "approved for demo" if approved else "rejected"
+        return AssistantResponse(
+            message=(
+                f"The proposed change was {action}. No external file was modified. "
+                "A live adapter would now re-read the file, verify its hash, apply the "
+                "approved patch, verify, and audit."
+            ),
+            proposal=self._proposal(),
+        )
+
+    def _proposal(self) -> ProposedFix:
+        original = LOCAL_FILES["ApprovalService.gs"]
+        updated = original.replace(
+            "MailApp.sendEmail('finance@example.com', 'Approval required', requesterEmail);",
+            "notifyFinance(requesterEmail, amount);",
+        )
+        proposal = ProposedFix(
+            status=self.proposal_status,
+            original_hash=sha256(original.encode()).hexdigest(),
+            explanation=(
+                "Remove hard-coded recipient handling and route through the approved "
+                "notification service."
+            ),
+            standards_impacted=[
+                "No hard-coded configuration",
+                "Use service boundaries",
+                "Human approval required",
+            ],
+            diff=self._diff("ApprovalService.gs", updated, original),
+        )
+        return proposal
 
     @staticmethod
     def _diff(path: str, local: str | None, remote: str | None) -> str:

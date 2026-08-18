@@ -8,7 +8,7 @@ def build_integration_health(state: UserSetupState) -> IntegrationHealthResponse
         _item("github", "GitHub", state.github_connected, "Connect GitHub"),
         _item("repository", "Repository", state.repository_connected, "Select repository"),
         _item("standards", "Company Standards", state.standards_configured, "Choose standards"),
-        _item("ai", "AI Engineer", state.ai_ready, "Configure AI"),
+        _item("ai", "Code Assistant", state.ai_ready, "Configure AI"),
     ]
     return IntegrationHealthResponse(
         ready=all(item.status == "READY" for item in items),
