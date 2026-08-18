@@ -58,7 +58,11 @@ Load `extension/dist` via Chrome's **Extensions > Developer mode > Load unpacked
 5. Pin and click **Legacy DevBridge** in Chrome's extension menu.
 6. Confirm the side panel shows the project title and ID. The repository remains **Not connected** until the GitHub integration milestone.
 
+Version 0.3 adds an isolated DevBridge toolbar directly to the Apps Script editor. Its **Project**, **Changes**, and **AI Engineer** actions open the corresponding side-panel section.
+
 After rebuilding, use the extension card's **Reload** button and reload the Apps Script tab so its content script is refreshed.
+
+For tenant-only distribution, build the private package with `npm run package:private` and follow [docs/private-tenant-deployment.md](docs/private-tenant-deployment.md). The listing should use private domain visibility and a pilot Google Group; it does not need to be public.
 
 ## Configuration
 

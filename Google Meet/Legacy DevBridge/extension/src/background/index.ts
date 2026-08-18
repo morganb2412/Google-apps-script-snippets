@@ -9,6 +9,13 @@ chrome.action.onClicked.addListener(async (tab) => {
 chrome.tabs.onRemoved.addListener((tabId) => projectByTab.delete(tabId));
 
 chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender, sendResponse) => {
+  if (message.type === "DEVBRIDGE_OPEN_PANEL" && sender.tab?.windowId !== undefined) {
+    void chrome.sidePanel.open({ windowId: sender.tab.windowId }).then(() => {
+      const navigation: ExtensionMessage = { type: "DEVBRIDGE_NAVIGATE", section: message.section };
+      return chrome.runtime.sendMessage(navigation);
+    }).catch(() => undefined);
+    return false;
+  }
   if (message.type === "DEVBRIDGE_PROJECT_CONTEXT" && sender.tab?.id !== undefined) {
     projectByTab.set(sender.tab.id, message.payload);
     void chrome.runtime.sendMessage({ type: "DEVBRIDGE_PROJECT_CONTEXT_CHANGED", payload: message.payload } satisfies ExtensionMessage).catch(() => undefined);

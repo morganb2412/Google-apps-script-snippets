@@ -1,5 +1,6 @@
 import type { ExtensionMessage, ProjectContext } from "../types/project";
 import { detectProjectContext } from "../utils/projectDetection";
+import { mountDevBridgeToolbar } from "./toolbar";
 
 let lastProjectKey = "";
 
@@ -24,6 +25,10 @@ chrome.runtime.onMessage.addListener((message: ExtensionMessage, _sender, sendRe
 });
 
 publishContext();
+mountDevBridgeToolbar((section) => {
+  const message: ExtensionMessage = { type: "DEVBRIDGE_OPEN_PANEL", section };
+  void chrome.runtime.sendMessage(message).catch(() => undefined);
+});
 new MutationObserver(publishContext).observe(document.querySelector("title") ?? document.documentElement, {
   childList: true,
   subtree: true,

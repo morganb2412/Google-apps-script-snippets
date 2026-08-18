@@ -22,6 +22,8 @@ POST /api/v1/projects/context/validate
 
 Detection supports `/home/projects/{scriptId}` and `/d/{scriptId}` editor URL forms. Context contains only the project ID, normalized display name, editor URL without query parameters, and detection time.
 
+The in-editor toolbar is mounted in an isolated Shadow DOM host with a stable DevBridge-owned element ID. It does not modify Google-owned toolbar nodes or depend on private CSS class names. This reduces breakage when Google changes the editor while still providing an embedded experience.
+
 ## Trust boundaries
 
 ```text
