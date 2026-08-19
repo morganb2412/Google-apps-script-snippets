@@ -30,7 +30,7 @@ export function App() {
     <Navigation active={active} onSelect={setActive} />
     <section className="panel">
       <p className="eyebrow">{active.toUpperCase()}</p>
-      {active === "Project" ? <><OnboardingWizard state={onboardingState} actions={onboardingActions} project={detectedProject} /><ProjectOverview state={projectState} apiState={apiState} /></> : <DemoView section={active} workspace={demo.workspace} actions={demo} />}
+      {active === "Project" ? <><OnboardingWizard state={onboardingState} actions={onboardingActions} project={detectedProject} /><ProjectOverview state={projectState} apiState={apiState} /></> : <><DemoView section={active} workspace={demo.workspace} actions={demo} />{demo.error && <p className="action-error" role="alert">{demo.error}</p>}</>}
     </section>
     <footer>Code Assistant &middot; Standards checked &middot; Human approval required</footer>
   </main>;

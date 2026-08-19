@@ -40,6 +40,8 @@ class DemoWorkspace(BaseModel):
     changes: list[DemoChange] = Field(default_factory=list)
     latest_commit: str | None = None
     pull_request_url: str | None = None
+    applied_proposal: str | None = None
+    audit_events: list[str] = Field(default_factory=list)
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 

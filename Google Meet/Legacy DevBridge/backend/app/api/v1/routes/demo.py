@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from app.demo.models import (
     AgentRequest,
@@ -34,17 +34,26 @@ async def connect(request: ConnectDemoRequest) -> DemoWorkspace:
 
 @router.post("/branches", response_model=DemoWorkspace)
 async def create_branch(request: BranchRequest) -> DemoWorkspace:
-    return _service.create_branch(request.name)
+    try:
+        return _service.create_branch(request.name)
+    except ValueError as error:
+        raise HTTPException(status_code=409, detail=str(error)) from error
 
 
 @router.post("/commits", response_model=DemoWorkspace)
 async def commit(request: CommitRequest) -> DemoWorkspace:
-    return _service.commit(request.message)
+    try:
+        return _service.commit(request.message)
+    except ValueError as error:
+        raise HTTPException(status_code=409, detail=str(error)) from error
 
 
 @router.post("/pull-requests", response_model=DemoWorkspace)
 async def pull_request() -> DemoWorkspace:
-    return _service.create_pull_request()
+    try:
+        return _service.create_pull_request()
+    except ValueError as error:
+        raise HTTPException(status_code=409, detail=str(error)) from error
 
 
 @router.post("/agent/plan", response_model=AgentResult)

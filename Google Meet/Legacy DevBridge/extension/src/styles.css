@@ -29,11 +29,19 @@ nav { display: flex; overflow-x: auto; gap: 4px; margin: 22px 0 16px; border-bot
 .setup-progress__fill { display: block; height: 100%; background: #66adff; transition: width .2s ease; }
 .setup-error { color: #ffb7a8; font-size: 12px; }
 .secondary { padding: 8px 11px; border: 1px solid #43566f; border-radius: 6px; color: #dce6f2; background: transparent; cursor: pointer; }
+.secondary:disabled, .primary:disabled { cursor: not-allowed; opacity: .45; }
 .demo-label { color: #f0aa55; font-size: 10px; font-weight: 700; letter-spacing: .1em; }
 .repo-name { font-family: ui-monospace, monospace; font-size: 15px; }
 .button-row { display: flex; flex-wrap: wrap; gap: 7px; margin: 12px 0; }
 .selected { border-color: #66adff; background: #1d3856; }
 .success-line { color: #69d6a3; font-size: 12px; }
+.success-line a { color: inherit; }
+.workflow-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 14px 0; }
+.workflow-steps span { padding: 7px; border: 1px solid #2b3a4e; border-radius: 5px; color: #718298; font-size: 9px; text-align: center; }
+.workflow-steps .done { border-color: #2d7058; color: #69d6a3; background: #10271f; }
+.action-error { padding: 10px; border: 1px solid #75493e; border-radius: 6px; color: #ffb7a8; background: #291713; font-size: 12px; }
+.audit-event { margin: 7px 0; color: #98a8bb; font-size: 11px; }
+details summary { color: #9eb2c8; cursor: pointer; font-size: 11px; }
 .count { color: #66adff; }
 .changes-list { display: grid; gap: 5px; margin: 14px 0; }
 .change { display: grid; grid-template-columns: 20px 1fr auto; gap: 7px; padding: 10px; border: 1px solid #27374b; border-radius: 6px; color: #dce5ef; text-align: left; background: #111925; cursor: pointer; }

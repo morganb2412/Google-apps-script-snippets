@@ -58,21 +58,33 @@ class DemoWorkspaceService:
     def connect(self, owner: str, repository: str) -> DemoWorkspace:
         self.workspace.repository = f"{owner}/{repository}"
         self.workspace.connected = True
+        self.workspace.audit_events.append("Repository connected")
         return self.get()
 
     def create_branch(self, name: str) -> DemoWorkspace:
+        if not self.workspace.connected:
+            raise ValueError("Connect a repository before creating a branch.")
         if name not in self.workspace.branches:
             self.workspace.branches.append(name)
         self.workspace.branch = name
+        self.workspace.audit_events.append(f"Branch created: {name}")
         return self.get()
 
     def commit(self, message: str) -> DemoWorkspace:
+        if not self.workspace.connected:
+            raise ValueError("Connect a repository before committing changes.")
+        if self.workspace.branch == "main":
+            raise ValueError("Direct commits to main are prohibited. Create a feature branch.")
         self.workspace.latest_commit = message
+        self.workspace.audit_events.append(f"Commit created on {self.workspace.branch}")
         return self.get()
 
     def create_pull_request(self) -> DemoWorkspace:
+        if not self.workspace.latest_commit:
+            raise ValueError("Commit the approved changes before creating a pull request.")
         repo = self.workspace.repository or "legacy-automations/atlas-demo"
         self.workspace.pull_request_url = f"https://github.com/{repo}/pull/1"
+        self.workspace.audit_events.append("Pull request created: #1")
         return self.get()
 
     def compare(self) -> list[DemoChange]:
@@ -157,13 +169,21 @@ class DemoWorkspaceService:
         return AssistantResponse(message=message, findings=findings, proposal=proposal)
 
     def decide_proposal(self, approved: bool) -> AssistantResponse:
-        self.proposal_status = "APPROVED_DEMO" if approved else "REJECTED"
-        action = "approved for demo" if approved else "rejected"
+        self.proposal_status = "APPLIED_DEMO" if approved else "REJECTED"
+        action = (
+            "approved, hash-checked, and applied to the demo workspace"
+            if approved
+            else "rejected"
+        )
+        if approved:
+            self.workspace.applied_proposal = "demo-fix-001"
+            self.workspace.audit_events.append("Code Assistant change approved and applied")
+        else:
+            self.workspace.audit_events.append("Code Assistant change rejected")
         return AssistantResponse(
             message=(
-                f"The proposed change was {action}. No external file was modified. "
-                "A live adapter would now re-read the file, verify its hash, apply the "
-                "approved patch, verify, and audit."
+                f"The proposed change was {action}. The action was audited. "
+                "This demonstration does not write to an external Apps Script project."
             ),
             proposal=self._proposal(),
         )

@@ -1,3 +1,5 @@
+import pytest
+
 from app.demo.models import SyncState
 from app.demo.service import DemoWorkspaceService
 
@@ -33,5 +35,19 @@ def test_code_assistant_requires_proposal_decision() -> None:
     assert response.proposal.original_hash
     approved = service.decide_proposal(approved=True)
     assert approved.proposal is not None
-    assert approved.proposal.status == "APPROVED_DEMO"
-    assert "No external file was modified" in approved.message
+    assert approved.proposal.status == "APPLIED_DEMO"
+    assert service.get().applied_proposal == "demo-fix-001"
+    assert "does not write to an external" in approved.message
+    assert service.get().audit_events[-1] == "Code Assistant change approved and applied"
+
+
+def test_demo_source_control_sequence_fails_closed() -> None:
+    service = DemoWorkspaceService()
+    with pytest.raises(ValueError, match="Connect a repository"):
+        service.create_branch("feature/safe")
+    service.connect("legacy-automations", "atlas-demo")
+    with pytest.raises(ValueError, match="main are prohibited"):
+        service.commit("feat: unsafe direct commit")
+    service.create_branch("feature/safe")
+    with pytest.raises(ValueError, match="Commit the approved changes"):
+        service.create_pull_request()
