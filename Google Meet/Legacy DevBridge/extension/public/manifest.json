@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Legacy DevBridge",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "Governed source control and conversational code assistance for Google Apps Script.",
   "icons": {
     "16": "icons/icon16.png",

@@ -4,6 +4,7 @@ import { ProjectOverview } from "../components/ProjectOverview";
 import { OnboardingWizard } from "../components/OnboardingWizard";
 import { DemoView } from "../components/DemoViews";
 import { StatusBadge } from "../components/StatusBadge";
+import { SectionErrorBoundary } from "../components/SectionErrorBoundary";
 import { useApiHealth } from "../hooks/useApiHealth";
 import { useProjectContext } from "../hooks/useProjectContext";
 import { useOnboarding } from "../hooks/useOnboarding";
@@ -30,7 +31,7 @@ export function App() {
     <Navigation active={active} onSelect={setActive} />
     <section className="panel">
       <p className="eyebrow">{active.toUpperCase()}</p>
-      {active === "Project" ? <><OnboardingWizard state={onboardingState} actions={onboardingActions} project={detectedProject} /><ProjectOverview state={projectState} apiState={apiState} /></> : <><DemoView section={active} workspace={demo.workspace} actions={demo} />{demo.error && <p className="action-error" role="alert">{demo.error}</p>}</>}
+      {active === "Project" ? <><OnboardingWizard state={onboardingState} actions={onboardingActions} project={detectedProject} /><ProjectOverview state={projectState} apiState={apiState} /></> : <SectionErrorBoundary section={active}><DemoView section={active} workspace={demo.workspace} actions={demo} />{demo.error && <p className="action-error" role="alert">{demo.error}</p>}</SectionErrorBoundary>}
     </section>
     <footer>Code Assistant &middot; Standards checked &middot; Human approval required</footer>
   </main>;
