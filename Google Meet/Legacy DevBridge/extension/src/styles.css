@@ -31,6 +31,7 @@ nav { display: flex; overflow-x: auto; gap: 4px; margin: 22px 0 16px; border-bot
 .secondary { padding: 8px 11px; border: 1px solid #43566f; border-radius: 6px; color: #dce6f2; background: transparent; cursor: pointer; }
 .secondary:disabled, .primary:disabled { cursor: not-allowed; opacity: .45; }
 .demo-label { color: #f0aa55; font-size: 10px; font-weight: 700; letter-spacing: .1em; }
+.live-label { color: #69d6a3; font-size: 10px; font-weight: 700; letter-spacing: .1em; }
 .repo-name { font-family: ui-monospace, monospace; font-size: 15px; }
 .button-row { display: flex; flex-wrap: wrap; gap: 7px; margin: 12px 0; }
 .selected { border-color: #66adff; background: #1d3856; }

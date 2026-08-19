@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Legacy DevBridge",
-  "version": "0.12.1",
+  "version": "0.13.0",
   "description": "Governed source control and conversational code assistance for Google Apps Script.",
   "icons": {
     "16": "icons/icon16.png",
@@ -10,7 +10,7 @@
     "128": "icons/icon128.png"
   },
   "permissions": ["sidePanel", "storage", "tabs"],
-  "host_permissions": ["https://script.google.com/*", "http://127.0.0.1:8000/*"],
+  "host_permissions": ["https://script.google.com/*", "http://127.0.0.1:8000/*", "https://legacy-devbridge-api-wwtovkiwnq-uc.a.run.app/*"],
   "background": { "service_worker": "background.js", "type": "module" },
   "side_panel": { "default_path": "index.html" },
   "action": {

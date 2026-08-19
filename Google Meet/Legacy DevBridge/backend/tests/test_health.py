@@ -9,4 +9,4 @@ def test_health_endpoint() -> None:
     body = response.json()
     assert body["status"] == "ok"
     assert body["service"] == "legacy-devbridge-api"
-    assert body["version"] == "0.12.0"
+    assert body["version"] == "0.13.0"

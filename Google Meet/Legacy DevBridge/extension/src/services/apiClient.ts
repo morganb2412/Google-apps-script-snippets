@@ -4,7 +4,7 @@ import type { UserSetupState } from "../types/onboarding";
 import type { AgentResult, AssistantResponse, DemoWorkspace } from "../types/demo";
 import { getDevBridgeSessionId } from "./session";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000/api/v1";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "https://legacy-devbridge-api-wwtovkiwnq-uc.a.run.app/api/v1";
 
 export async function getHealth(signal?: AbortSignal): Promise<HealthResponse> {
   const response = await fetch(`${API_BASE_URL}/health`, { signal, headers: { Accept: "application/json" } });
@@ -100,4 +100,12 @@ export const demoApi = {
   agent: (mode: "plan" | "review", userRequest: string) => request<AgentResult>(`/demo/agent/${mode}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ request: userRequest }) }),
   chat: (userRequest: string) => request<AssistantResponse>("/demo/assistant/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ request: userRequest }) }),
   decide: (proposalId: string, approved: boolean) => request<AssistantResponse>(`/demo/assistant/${approved ? "approve" : "reject"}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ proposal_id: proposalId }) }),
+};
+
+export const agentApi = {
+  chat: (userRequest: string, scriptId?: string) => request<AssistantResponse>("/agent/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ request: userRequest, script_id: scriptId }),
+  }),
 };

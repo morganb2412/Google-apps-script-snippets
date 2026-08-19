@@ -19,6 +19,10 @@ class Settings(BaseSettings):
     github_app_id: str = ""
     github_app_private_key: str = ""
     github_app_name: str = ""
+    managed_ai_enabled: bool = False
+    google_cloud_project: str = ""
+    vertex_location: str = "global"
+    vertex_model: str = "gemini-2.5-flash"
 
     @property
     def cors_origins(self) -> list[str]:

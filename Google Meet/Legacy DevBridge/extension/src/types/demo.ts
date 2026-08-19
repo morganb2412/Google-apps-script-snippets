@@ -8,4 +8,4 @@ export interface DemoWorkspace {
 }
 export interface AgentResult { mode: "DEMO"; title: string; summary: string; items: string[]; files_affected: string[]; oauth_changes: string[] }
 export interface ProposedFix { proposal_id: string; status: string; file: string; operation: string; original_hash: string; explanation: string; standards_impacted: string[]; risk_level: string; diff: string }
-export interface AssistantResponse { mode: "DEMO"; message: string; findings: string[]; proposal: ProposedFix | null }
+export interface AssistantResponse { mode: "DEMO" | "LIVE"; message: string; findings: string[]; proposal: ProposedFix | null; provider?: string; model?: string }

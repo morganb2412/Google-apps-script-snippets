@@ -7,5 +7,5 @@ from pydantic import BaseModel, Field
 class HealthResponse(BaseModel):
     status: Literal["ok"] = "ok"
     service: str = "legacy-devbridge-api"
-    version: str = "0.12.0"
+    version: str = "0.13.0"
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))

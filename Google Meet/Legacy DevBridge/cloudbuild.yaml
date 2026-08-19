@@ -16,8 +16,11 @@ steps:
       - --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/legacy-devbridge/api:${_TAG}
       - --region=${_REGION}
       - --platform=managed
-      - --no-allow-unauthenticated
-      - --set-env-vars=DEVBRIDGE_ENVIRONMENT=production
+      - --no-invoker-iam-check
+      - --service-account=devbridge-runtime@${PROJECT_ID}.iam.gserviceaccount.com
+      - --max-instances=1
+      - --set-env-vars=^@^DEVBRIDGE_ENVIRONMENT=production@DEVBRIDGE_GOOGLE_OAUTH_ENABLED=true@DEVBRIDGE_GOOGLE_OAUTH_REDIRECT_URI=https://legacy-devbridge-api-wwtovkiwnq-uc.a.run.app/api/v1/onboarding/google/callback@DEVBRIDGE_GOOGLE_ALLOWED_DOMAINS=legacyautomations.ai,moesaidevspace.com@DEVBRIDGE_MANAGED_AI_ENABLED=true@DEVBRIDGE_GOOGLE_CLOUD_PROJECT=${PROJECT_ID}@DEVBRIDGE_VERTEX_LOCATION=global@DEVBRIDGE_VERTEX_MODEL=gemini-2.5-flash
+      - --set-secrets=DEVBRIDGE_GOOGLE_OAUTH_CLIENT_ID=google-oauth-client-id:latest,DEVBRIDGE_GOOGLE_OAUTH_CLIENT_SECRET=google-oauth-client-secret:latest
 images:
   - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/legacy-devbridge/api:${_TAG}
 options:
